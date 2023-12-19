@@ -1,10 +1,18 @@
 const dotenv = require("dotenv");
-
-const app = require("./app");
-
 dotenv.config({
   path: "./.env",
 });
+
+const app = require("./app");
+const pool = require("./config/db");
+
+// Database connection
+pool
+  .connect()
+  .then(() => console.log("Connected to the database"))
+  .catch((error) => {
+    console.error("Error connecting to the database", error);
+  });
 
 // Run server
 const port = process.env.PORT || 3000;
