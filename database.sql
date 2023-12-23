@@ -1,3 +1,4 @@
+-- Create Tables
 CREATE TABLE IF NOT EXISTS categories (
 	category_id BIGSERIAL PRIMARY KEY,
 	category_name VARCHAR(255) NOT NULL UNIQUE,
@@ -73,3 +74,8 @@ CREATE TABLE IF NOT EXISTS wishlists (
 	CONSTRAINT wishlist_product_fk FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT wishlist_user_fk FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+-- Create Views
+CREATE OR REPLACE VIEW categories_view
+AS 
+SELECT * FROM categories;

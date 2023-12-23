@@ -45,6 +45,7 @@ module.exports = (err, req, res, next) => {
     sendToDev(err, res);
   } else if (process.env.NODE_ENV === "production") {
     let error = { ...err };
+    error.message = err.message;
 
     if (error.code === "23505") error = handleDuplicateDBError(error);
     sendToProd(error, res);
