@@ -13,6 +13,9 @@ app.use(express.json());
 
 // 2) Development logging
 if (process.env.NODE_ENV == "development") {
+  console.log("===============================");
+  console.log("Development mood");
+  console.log("===============================");
   app.use(morgan("dev"));
 }
 

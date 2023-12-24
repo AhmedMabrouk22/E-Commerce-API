@@ -49,3 +49,23 @@ exports.getAllCategories = catchAsync(async (req, res, next) => {
     categories,
   });
 });
+
+// @desc  : Update Category
+// @Route : PATCH  api/v1/categories/:id
+// @access: Private
+exports.UpdateCategory = catchAsync(async (req, res, next) => {
+  const category = {
+    category_id: req.params.id,
+    category_name: req.body.category_name,
+  };
+
+  const newCategory = await categoryServices.updateCategoryById(category);
+  if (!newCategory) {
+    return next(new AppError(`this category not found`, 404));
+  }
+
+  res.status(200).json({
+    status: httpStatus.SUCCESS,
+    category: newCategory,
+  });
+});

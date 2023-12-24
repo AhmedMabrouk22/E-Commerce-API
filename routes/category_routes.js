@@ -8,6 +8,9 @@ router
   .route("/")
   .post(categoryController.createCategory)
   .get(categoryController.getAllCategories);
-router.route("/:id").get(categoryController.getCategoryById);
+router
+  .route("/:id")
+  .get(categoryController.getCategoryById)
+  .patch(categoryController.UpdateCategory);
 
 module.exports = router;

@@ -1,3 +1,5 @@
+const slug = require("slugify");
+
 const AppError = require("../utils/appError");
 const categoryModel = require("./../models/category_model");
 
@@ -22,11 +24,8 @@ exports.getCategoryById = async (cat_id) => {
       filter: { category_id: cat_id },
     };
     const category = await categoryModel.findById(config);
-    if (!category) {
-      return null;
-    }
 
-    if (!category.category_image) {
+    if (category && !category.category_image) {
       defaultImage(category);
     }
     return category;
@@ -46,6 +45,11 @@ exports.getAllCategories = async (stringQuery) => {
       delete queryObj[elm];
     });
     config.filter = queryObj;
+
+    // sorting
+    if (stringQuery.sort) {
+      config.sort = stringQuery.sort.split(",");
+    }
 
     // Paginate
     const page = stringQuery.page * 1 || 1;
@@ -67,4 +71,16 @@ exports.getAllCategories = async (stringQuery) => {
   } catch (error) {
     throw error;
   }
+};
+
+exports.updateCategoryById = async (category) => {
+  category.category_name = category.category_name.trim();
+  category.category_slug = slug(category.category_name).toLowerCase();
+
+  const newCategory = await categoryModel.updateById(category);
+  if (newCategory && !newCategory.category_image) {
+    defaultImage(newCategory);
+  }
+
+  return newCategory;
 };

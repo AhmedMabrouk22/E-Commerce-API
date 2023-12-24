@@ -7,6 +7,12 @@ const handleDuplicateDBError = (err) => {
   return new AppError(message, 400);
 };
 
+const handleColumnDBError = (err) => {
+  value = err.message.match(/"([^"]+)"/)[1];
+  const message = `Field ${value} not exist`;
+  return new AppError(message, 400);
+};
+
 const sendToDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -48,6 +54,7 @@ module.exports = (err, req, res, next) => {
     error.message = err.message;
 
     if (error.code === "23505") error = handleDuplicateDBError(error);
+    if (error.code === "42703") error = handleColumnDBError(error);
     sendToProd(error, res);
   }
 };
