@@ -84,3 +84,7 @@ exports.updateCategoryById = async (category) => {
 
   return newCategory;
 };
+
+exports.deleteCategoryById = async (category_id) => {
+  return await categoryModel.deleteById(category_id);
+};

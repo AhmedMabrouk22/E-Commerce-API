@@ -11,6 +11,7 @@ router
 router
   .route("/:id")
   .get(categoryController.getCategoryById)
-  .patch(categoryController.UpdateCategory);
+  .patch(categoryController.UpdateCategory)
+  .delete(categoryController.deleteCategory);
 
 module.exports = router;

@@ -113,3 +113,14 @@ exports.updateById = async (category) => {
     throw error;
   }
 };
+
+exports.deleteById = async (category_id) => {
+  try {
+    const query = `DELETE FROM categories_view WHERE category_id = $1`;
+    const values = [category_id];
+    const result = await pool.query(query, values);
+    return result.rowCount;
+  } catch (error) {
+    throw error;
+  }
+};
