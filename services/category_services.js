@@ -3,15 +3,15 @@ const slug = require("slugify");
 const categoryModel = require("./../models/category_model");
 
 const defaultImage = (category) => {
-  category.category_image = "category_default.jpg";
+  if (category && !category.category_image) {
+    category.category_image = "category_default.jpg";
+  }
 };
 
 exports.createCategory = async (catReq) => {
   try {
     const category = await categoryModel.create(catReq);
-    if (category && !category.category_image) {
-      defaultImage(category);
-    }
+    defaultImage(category);
     return category;
   } catch (error) {
     throw error;
@@ -24,10 +24,7 @@ exports.getCategoryById = async (cat_id) => {
       filter: { category_id: cat_id },
     };
     const category = await categoryModel.findById(config);
-
-    if (category && !category.category_image) {
-      defaultImage(category);
-    }
+    defaultImage(category);
     return category;
   } catch (error) {
     throw error;
@@ -65,9 +62,9 @@ exports.getAllCategories = async (stringQuery) => {
       config.fields = "*";
     }
 
-    // sort
-
-    return await categoryModel.find(config);
+    const categories = await categoryModel.find(config);
+    categories.forEach((elm) => defaultImage(elm));
+    return categories;
   } catch (error) {
     throw error;
   }

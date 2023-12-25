@@ -8,9 +8,6 @@ exports.categoryIdValidator = [
 ];
 
 exports.createCategoryValidator = [
-  body("name")
-    .notEmpty()
-    .toLowerCase()
-    .withMessage("Category name must has name"),
+  body("name").notEmpty().toLowerCase().withMessage("Category must has name"),
   validatorMiddleware,
 ];

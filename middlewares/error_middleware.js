@@ -52,6 +52,7 @@ module.exports = (err, req, res, next) => {
   } else if (process.env.NODE_ENV === "production") {
     let error = { ...err };
     error.message = err.message;
+    error.stack = err.stack;
 
     if (error.code === "23505") error = handleDuplicateDBError(error);
     if (error.code === "42703") error = handleColumnDBError(error);
