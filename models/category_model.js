@@ -1,4 +1,3 @@
-const AppError = require("../utils/appError");
 const pool = require("./../config/db");
 
 const buildWhereClause = (filters, values) => {
@@ -51,7 +50,7 @@ const buildQuery = (config, values) => {
     values.push(config.paginate.skip);
   }
   return `SELECT ${fields} 
-          FROM categories_view
+          FROM categories
           ${whereClause}
           ${orderBy}
           ${paginate}`;
@@ -59,7 +58,7 @@ const buildQuery = (config, values) => {
 
 exports.create = async (category) => {
   try {
-    const query = `INSERT INTO categories_view (category_name,category_slug,category_image) 
+    const query = `INSERT INTO categories (category_name,category_slug,category_image) 
                   VALUES($1,$2,$3) RETURNING *`;
     const values = [
       category.category_name,
@@ -98,7 +97,7 @@ exports.find = async (config) => {
 
 exports.updateById = async (category) => {
   try {
-    const query = `UPDATE categories_view 
+    const query = `UPDATE categories 
                 SET category_name = $1,
                     category_slug = $2
                 WHERE category_id = $3 RETURNING *`;
@@ -116,7 +115,7 @@ exports.updateById = async (category) => {
 
 exports.deleteById = async (category_id) => {
   try {
-    const query = `DELETE FROM categories_view WHERE category_id = $1`;
+    const query = `DELETE FROM categories WHERE category_id = $1`;
     const values = [category_id];
     const result = await pool.query(query, values);
     return result.rowCount;

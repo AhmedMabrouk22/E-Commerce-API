@@ -1,6 +1,5 @@
 const slug = require("slugify");
 
-const AppError = require("../utils/appError");
 const categoryModel = require("./../models/category_model");
 
 const defaultImage = (category) => {
