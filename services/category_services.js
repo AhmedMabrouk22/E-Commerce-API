@@ -1,9 +1,10 @@
 const slug = require("slugify");
 
 const categoryModel = require("./../models/category_model");
+const ApiFeatures = require("./../utils/apiFeatures");
 
 const defaultImage = (category) => {
-  if (category && !category.category_image) {
+  if (category && category.category_image === undefined) {
     category.category_image = "category_default.jpg";
   }
 };
@@ -34,34 +35,11 @@ exports.getCategoryById = async (cat_id) => {
 exports.getAllCategories = async (stringQuery) => {
   try {
     let config = {};
-
-    // filter
-    const queryObj = { ...stringQuery };
-    const excludeFields = ["sort", "page", "limit", "fields"];
-    excludeFields.forEach((elm) => {
-      delete queryObj[elm];
-    });
-    config.filter = queryObj;
-
-    // sorting
-    if (stringQuery.sort) {
-      config.sort = stringQuery.sort.split(",");
-    }
-
-    // Paginate
-    const page = stringQuery.page * 1 || 1;
-    const limit = stringQuery.limit * 1 || 100;
-    const skip = (page - 1) * limit;
-    config.paginate = { limit, skip };
-
-    // limitFields
-    if (stringQuery.fields) {
-      const fields = stringQuery.fields.split(",");
-      config.fields = fields;
-    } else {
-      config.fields = "*";
-    }
-
+    const api = new ApiFeatures(stringQuery, config)
+      .filter()
+      .limitFields()
+      .paginate()
+      .sort();
     const categories = await categoryModel.find(config);
     categories.forEach((elm) => defaultImage(elm));
     return categories;
