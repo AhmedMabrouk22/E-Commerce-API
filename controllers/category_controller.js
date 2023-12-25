@@ -56,7 +56,7 @@ exports.getAllCategories = catchAsync(async (req, res, next) => {
 exports.UpdateCategory = catchAsync(async (req, res, next) => {
   const category = {
     category_id: req.params.id,
-    category_name: req.body.category_name,
+    category_name: req.body.name,
   };
 
   const newCategory = await categoryServices.updateCategoryById(category);

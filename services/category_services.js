@@ -10,9 +10,10 @@ const defaultImage = (category) => {
 exports.createCategory = async (catReq) => {
   try {
     const category = await categoryModel.create(catReq);
-    if (!category.category_image) {
+    if (category && !category.category_image) {
       defaultImage(category);
     }
+    return category;
   } catch (error) {
     throw error;
   }
