@@ -42,6 +42,10 @@ class ApiFeatures {
     }
     return this;
   }
+
+  getApiConfig() {
+    return this.config;
+  }
 }
 
 module.exports = ApiFeatures;

@@ -9,8 +9,13 @@ const defaultImage = (category) => {
   }
 };
 
-exports.createCategory = async (catReq) => {
+exports.createCategory = async (req) => {
   try {
+    const catReq = {
+      category_name: req.body.name.trim(),
+      category_slug: slug(req.body.name).toLowerCase(),
+    };
+
     const category = await categoryModel.create(catReq);
     defaultImage(category);
     return category;
@@ -34,13 +39,13 @@ exports.getCategoryById = async (cat_id) => {
 
 exports.getAllCategories = async (stringQuery) => {
   try {
-    let config = {};
-    const api = new ApiFeatures(stringQuery, config)
+    const api = new ApiFeatures(stringQuery, {})
       .filter()
       .limitFields()
       .paginate()
-      .sort();
-    const categories = await categoryModel.find(config);
+      .sort()
+      .getApiConfig();
+    const categories = await categoryModel.find(api);
     categories.forEach((elm) => defaultImage(elm));
     return categories;
   } catch (error) {
@@ -48,9 +53,14 @@ exports.getAllCategories = async (stringQuery) => {
   }
 };
 
-exports.updateCategoryById = async (category) => {
-  category.category_name = category.category_name.trim();
-  category.category_slug = slug(category.category_name).toLowerCase();
+exports.updateCategoryById = async (req) => {
+  let category = {
+    category_id: req.params.id,
+  };
+  if (req.body.name) {
+    category.category_name = req.body.name.trim();
+    category.category_slug = slug(req.body.name.toLowerCase());
+  }
 
   const newCategory = await categoryModel.updateById(category);
   if (newCategory && !newCategory.category_image) {

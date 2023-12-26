@@ -13,6 +13,12 @@ const handleColumnDBError = (err) => {
   return new AppError(message, 400);
 };
 
+const foreignKeyDBError = (err) => {
+  const value = err.detail.match(/\(([^)]+)\)/g)[0];
+  const message = `${value} not found`;
+  return new AppError(message, 404);
+};
+
 const sendToDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -56,6 +62,7 @@ module.exports = (err, req, res, next) => {
 
     if (error.code === "23505") error = handleDuplicateDBError(error);
     if (error.code === "42703") error = handleColumnDBError(error);
+    if (error.code === "23503") error = foreignKeyDBError(error);
     sendToProd(error, res);
   }
 };

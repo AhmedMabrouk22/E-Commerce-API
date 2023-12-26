@@ -1,6 +1,18 @@
 const pool = require("../config/db");
 
 class DatabaseQuery {
+  /**
+   * Prepare sql query
+   * @param fields array to specify select clause (must in select,insert).
+   * @param table string to specify table or view (must in all).
+   * @param where object to specify where clause (must in select,update,delete)
+   * Ex: {
+   * key1 : val1,
+   * key2 : {key2.1 : val2.1 , key2.2 : val2.2}
+   * }
+   * @param orderBy array to specify order by clause
+   * @param limit object to specify limit and offset
+   */
   constructor({ fields, table, where, orderBy, limit }) {
     const _fields = fields;
     const _table = table;
@@ -128,6 +140,11 @@ class DatabaseQuery {
     }
   }
 
+  /**
+   * Run update query in sql
+   * @param {*} obj {key1 : value1, kay2 : value2}
+   * @returns
+   */
   async update(obj) {
     this.#isExist(["table"]);
     try {

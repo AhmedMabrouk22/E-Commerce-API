@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS sub_categories (
 	subCategory_name VARCHAR(255) NOT NULL UNIQUE,
 	subCategory_slug TEXT,
 	category_id BIGINT,
-	CONSTRAINT subCategory_cat_fk FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE SET NULL ON UPDATE CASCADE,
+	CONSTRAINT subCategory_cat_fk FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS brands (
@@ -35,13 +35,6 @@ CREATE TABLE IF NOT EXISTS products (
 	CONSTRAINT product_brand_fk FOREIGN KEY (brand_id) REFERENCES brands(brand_id) ON DELETE SET NULL ON UPDATE CASCADE,
 	create_at TIMESTAMP,
 	update_at TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS product_subCategories (
-	product_id BIGINT PRIMARY KEY,
-	subCategory_id BIGINT,
-	CONSTRAINT product_subCategories_fk FOREIGN KEY(subCategory_id) REFERENCES sub_categories(subCategory_id) ON DELETE SET NULL ON UPDATE CASCADE
-
 );
 
 CREATE TABLE IF NOT EXISTS cites (
@@ -91,3 +84,8 @@ CREATE TABLE IF NOT EXISTS wishlists (
 );
 
 -- Create Views
+CREATE VIEW subCategory_view
+AS 
+SELECT s.subcategory_id, s.subcategory_name,s.subcategory_slug,s.category_id,c.category_name
+FROM sub_categories s LEFT JOIN categories c
+ON s.category_id = c.category_id;
