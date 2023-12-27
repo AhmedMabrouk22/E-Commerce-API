@@ -3,8 +3,10 @@ const morgan = require("morgan");
 
 const categoryRouter = require("./routes/category_routes");
 const subCategoryRouter = require("./routes/subCategory_routes");
+const brandRouter = require("./routes/brand_routes");
 const globalError = require("./middlewares/error_middleware");
 const AppError = require("./utils/appError");
+
 // Start express app
 const app = express();
 
@@ -22,6 +24,7 @@ if (process.env.NODE_ENV == "development") {
 // 3) Routes
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/subCategories", subCategoryRouter);
+app.use("/api/v1/brands", brandRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

@@ -1,34 +1,13 @@
 const DatabaseQuery = require("./../utils/database");
 
-exports.create = async (category) => {
+exports.create = async (brand) => {
   try {
-    const values = [
-      category.category_name,
-      category.category_slug,
-      category.category_image,
-    ];
-
+    const values = [brand.brand_name, brand.brand_slug, brand.brand_image];
     const db = new DatabaseQuery({
-      table: "categories",
-      fields: ["category_name", "category_slug", "category_image"],
+      table: "brands",
+      fields: ["brand_name", "brand_slug", "brand_image"],
     });
-
     const result = await db.insert(values);
-
-    return result.rows[0];
-  } catch (error) {
-    throw error;
-  }
-};
-
-exports.findById = async (config) => {
-  try {
-    const db = new DatabaseQuery({
-      where: config.filter,
-      table: "categories",
-    });
-
-    const result = await db.select();
     return result.rows[0];
   } catch (error) {
     throw error;
@@ -38,13 +17,12 @@ exports.findById = async (config) => {
 exports.find = async (config) => {
   try {
     const db = new DatabaseQuery({
+      table: "brands",
       fields: config.fields,
-      table: "categories",
       where: config.filter,
       orderBy: config.sort,
       limit: config.paginate,
     });
-
     const result = await db.select();
     return result.rows;
   } catch (error) {
@@ -52,17 +30,31 @@ exports.find = async (config) => {
   }
 };
 
-exports.updateById = async (category) => {
+exports.findById = async (config) => {
   try {
     const db = new DatabaseQuery({
-      table: "categories",
-      where: { category_id: category.category_id },
+      where: config.filter,
+      table: "brands",
+    });
+
+    const result = await db.select();
+    return result.rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.updateById = async (brand) => {
+  try {
+    const db = new DatabaseQuery({
+      table: "brands",
+      where: { brand_id: brand.brand_id },
     });
 
     let obj = {};
-    if (category.category_name) {
-      obj.category_name = category.category_name;
-      obj.category_slug = category.category_slug;
+    if (brand.brand_name) {
+      obj.brand_name = brand.brand_name;
+      obj.brand_slug = brand.brand_slug;
     }
 
     const result = await db.update(obj);
@@ -72,11 +64,11 @@ exports.updateById = async (category) => {
   }
 };
 
-exports.deleteById = async (category_id) => {
+exports.deleteById = async (brand_id) => {
   try {
     const db = new DatabaseQuery({
-      table: "categories",
-      where: { category_id },
+      table: "brands",
+      where: { brand_id },
     });
     const result = await db.delete();
     return result.rowCount;
