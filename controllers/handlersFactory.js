@@ -42,7 +42,7 @@ exports.UpdateOne = (updateServices) =>
 exports.getOne = (getOneServices) =>
   catchAsync(async (req, res, next) => {
     const id = req.params.id;
-    const result = await getOneServices(id);
+    const result = await getOneServices(req);
     if (!result) {
       return notFoundMessage(next);
     }
@@ -55,7 +55,7 @@ exports.getOne = (getOneServices) =>
 
 exports.get = (getServices) =>
   catchAsync(async (req, res, next) => {
-    const result = await getServices(req.query);
+    const result = await getServices(req);
     res.status(200).json({
       status: httpStatus.SUCCESS,
       result: result.length,

@@ -24,8 +24,9 @@ exports.createCategory = async (req) => {
   }
 };
 
-exports.getCategoryById = async (cat_id) => {
+exports.getCategoryById = async (req) => {
   try {
+    const cat_id = req.params.id;
     let config = {
       filter: { category_id: cat_id },
     };
@@ -37,8 +38,9 @@ exports.getCategoryById = async (cat_id) => {
   }
 };
 
-exports.getAllCategories = async (stringQuery) => {
+exports.getAllCategories = async (req) => {
   try {
+    const stringQuery = req.query;
     const api = new ApiFeatures(stringQuery, {})
       .filter()
       .limitFields()

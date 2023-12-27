@@ -38,14 +38,21 @@ exports.updateSubCategory = async (req) => {
   }
 };
 
-exports.getAllSubCategories = async (stringQuery) => {
+exports.getAllSubCategories = async (req) => {
   try {
+    const stringQuery = req.query;
     const api = new ApiFeatures(stringQuery, {})
       .filter()
       .limitFields()
       .paginate()
       .sort()
       .getApiConfig();
+
+    const category_id = req.params.categoryId;
+    if (category_id) {
+      api.filter = { ...api.filter, category_id };
+    }
+
     const subCategories = await subCategoryModel.find(api);
     return subCategories;
   } catch (error) {
@@ -53,8 +60,9 @@ exports.getAllSubCategories = async (stringQuery) => {
   }
 };
 
-exports.getSubCategoryById = async (subCategory_id) => {
+exports.getSubCategoryById = async (req) => {
   try {
+    const subCategory_id = req.params.id;
     let config = {
       filter: { subcategory_id: subCategory_id },
     };
