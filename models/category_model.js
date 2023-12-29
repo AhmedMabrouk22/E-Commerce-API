@@ -1,3 +1,4 @@
+const pool = require("./../config/db");
 const DatabaseQuery = require("./../utils/database");
 
 exports.create = async (category) => {
@@ -8,12 +9,14 @@ exports.create = async (category) => {
       category.category_image,
     ];
 
-    const db = new DatabaseQuery({
-      table: "categories",
-      fields: ["category_name", "category_slug", "category_image"],
-    });
-
-    const result = await db.insert(values);
+    const result = await DatabaseQuery.insert(
+      pool,
+      {
+        table: "categories",
+        fields: ["category_name", "category_slug", "category_image"],
+      },
+      values
+    );
 
     return result.rows[0];
   } catch (error) {
@@ -23,12 +26,10 @@ exports.create = async (category) => {
 
 exports.findById = async (config) => {
   try {
-    const db = new DatabaseQuery({
-      where: config.filter,
+    const result = await DatabaseQuery.select(pool, {
       table: "categories",
+      where: config.filter,
     });
-
-    const result = await db.select();
     return result.rows[0];
   } catch (error) {
     throw error;
@@ -37,15 +38,13 @@ exports.findById = async (config) => {
 
 exports.find = async (config) => {
   try {
-    const db = new DatabaseQuery({
+    const result = await DatabaseQuery.select(pool, {
       fields: config.fields,
       table: "categories",
       where: config.filter,
       orderBy: config.sort,
       limit: config.paginate,
     });
-
-    const result = await db.select();
     return result.rows;
   } catch (error) {
     throw error;
@@ -54,18 +53,15 @@ exports.find = async (config) => {
 
 exports.updateById = async (category) => {
   try {
-    const db = new DatabaseQuery({
-      table: "categories",
-      where: { category_id: category.category_id },
-    });
-
-    let obj = {};
-    if (category.category_name) {
-      obj.category_name = category.category_name;
-      obj.category_slug = category.category_slug;
-    }
-
-    const result = await db.update(obj);
+    const result = await DatabaseQuery.update(
+      pool,
+      {
+        table: "categories",
+        where: { category_id: category.category_id },
+        fields: ["category_name", "category_slug"],
+      },
+      [category.category_name, category.category_slug]
+    );
     return result.rows[0];
   } catch (error) {
     throw error;
@@ -74,11 +70,10 @@ exports.updateById = async (category) => {
 
 exports.deleteById = async (category_id) => {
   try {
-    const db = new DatabaseQuery({
+    const result = await DatabaseQuery.delete(pool, {
       table: "categories",
       where: { category_id },
     });
-    const result = await db.delete();
     return result.rowCount;
   } catch (error) {
     throw error;
