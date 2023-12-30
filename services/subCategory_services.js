@@ -6,8 +6,8 @@ const ApiFeatures = require("./../utils/apiFeatures");
 exports.createSubCategory = async (req) => {
   try {
     const subCategory = {
-      subCategory_name: req.body.name,
-      subCategory_slug: slug(req.body.name.toLowerCase()),
+      subCategory_name: req.body.subcategory_name,
+      subCategory_slug: slug(req.body.subcategory_name.toLowerCase()),
       category_id: req.params.categoryId * 1,
     };
     const newSubCategory = await subCategoryModel.create(subCategory);
@@ -22,9 +22,11 @@ exports.updateSubCategory = async (req) => {
     let subCategory = {
       subcategory_id: req.params.id,
     };
-    if (req.body.name) {
-      subCategory.subCategory_name = req.body.name;
-      subCategory.subCategory_slug = slug(req.body.name.toLowerCase());
+    if (req.body.subcategory_name) {
+      subCategory["subCategory_name"] = req.body.subcategory_name;
+      subCategory["subCategory_slug"] = slug(
+        req.body.subcategory_name.toLowerCase()
+      );
     }
 
     if (req.body.category_id) {

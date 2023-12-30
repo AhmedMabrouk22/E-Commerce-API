@@ -8,7 +8,7 @@ exports.subCategoryIdValidator = [
 ];
 
 exports.createSubCategoryValidator = [
-  body("name")
+  body("subcategory_name")
     .notEmpty()
     .trim()
     .toLowerCase()

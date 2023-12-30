@@ -1,17 +1,18 @@
+const pool = require("./../config/db");
 const DatabaseQuery = require("../utils/database");
 
 exports.create = async (subCategory) => {
   try {
-    const values = [
-      subCategory.subCategory_name,
-      subCategory.subCategory_slug,
-      subCategory.category_id,
-    ];
-    const db = new DatabaseQuery({
-      table: "sub_categories",
-      fields: ["subCategory_name", "subCategory_slug", "category_id"],
-    });
-    const result = await db.insert(values);
+    const fieldsAndValues = DatabaseQuery.buildFieldsAndValues(subCategory);
+
+    const result = await DatabaseQuery.insert(
+      pool,
+      {
+        table: "sub_categories",
+        fields: fieldsAndValues[0],
+      },
+      fieldsAndValues[1]
+    );
     return result.rows[0];
   } catch (error) {
     throw error;
@@ -20,22 +21,23 @@ exports.create = async (subCategory) => {
 
 exports.updateById = async (subCategory) => {
   try {
-    const db = new DatabaseQuery({
-      table: "sub_categories",
-      where: { subcategory_id: subCategory.subcategory_id },
-    });
-
-    let obj = {};
-    if (subCategory.subCategory_name) {
-      obj.subCategory_name = subCategory.subCategory_name;
-      obj.subCategory_slug = subCategory.subCategory_slug;
+    let obj = { ...subCategory };
+    delete obj.subcategory_id;
+    const fieldsAndValues = DatabaseQuery.buildFieldsAndValues(obj); // [fields,values]
+    if (!fieldsAndValues) {
+      throw new Error(`something wrong in fieldsAndValues`);
     }
 
-    if (subCategory.category_id) {
-      obj.category_id = subCategory.category_id;
-    }
+    const result = await DatabaseQuery.update(
+      pool,
+      {
+        table: "sub_categories",
+        where: { subcategory_id: subCategory.subcategory_id },
+        fields: fieldsAndValues[0],
+      },
+      fieldsAndValues[1]
+    );
 
-    const result = await db.update(obj);
     return result.rows[0];
   } catch (error) {
     throw error;
@@ -44,15 +46,13 @@ exports.updateById = async (subCategory) => {
 
 exports.find = async (config) => {
   try {
-    const db = new DatabaseQuery({
+    const result = await DatabaseQuery.select(pool, {
       fields: config.fields,
       table: "subCategory_view",
       where: config.filter,
       orderBy: config.sort,
       limit: config.paginate,
     });
-
-    const result = await db.select();
     return result.rows;
   } catch (error) {
     throw error;
@@ -61,12 +61,10 @@ exports.find = async (config) => {
 
 exports.findById = async (config) => {
   try {
-    const db = new DatabaseQuery({
+    const result = await DatabaseQuery.select(pool, {
       where: config.filter,
       table: "subCategory_view",
     });
-
-    const result = await db.select();
     return result.rows[0];
   } catch (error) {
     throw error;
@@ -75,11 +73,10 @@ exports.findById = async (config) => {
 
 exports.deleteById = async (subCategory_id) => {
   try {
-    const db = new DatabaseQuery({
+    const result = await DatabaseQuery.delete(pool, {
       table: "sub_categories",
       where: { subcategory_id: subCategory_id },
     });
-    const result = await db.delete();
     return result.rowCount;
   } catch (error) {
     throw error;
