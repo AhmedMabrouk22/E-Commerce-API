@@ -198,8 +198,11 @@ exports.updateById = async (product) => {
       fieldsAndValues[1]
     );
 
-    // 2) Update product_sub_categories table
+    if (updatedProduct.rowCount === 0) {
+      return null;
+    }
     if (product.product_sub_categories) {
+      // 2) Update product_sub_categories table
       await updateSubCategories(
         client,
         updatedProduct.rows[0],
