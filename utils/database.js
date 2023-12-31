@@ -45,13 +45,14 @@ const buildLimitClause = (paginate, values) => {
   return ``;
 };
 
-const buildQuery = (config, values) => {
+const buildQuery = (config, values, options) => {
   const fields = config.fields ? [...config.fields] : "*";
   const whereClause = buildWhereClause(config.where, values);
   const orderBy = buildOrderByClause(config.orderBy);
   const paginate = buildLimitClause(config.limit, values);
 
-  return `SELECT ${fields}
+  const distinct = options.distinct === true ? `DISTINCT ` : ``;
+  return `SELECT ${distinct}${fields}
           FROM ${config.table}
           ${whereClause}
           ${orderBy}
@@ -94,13 +95,14 @@ exports.insert = async (
 
 exports.select = async (
   pool,
-  databaseConfig = { fields, table, where, orderBy, limit }
+  databaseConfig = { fields, table, where, orderBy, limit },
+  options = { distinct: false }
 ) => {
   isExist(["table"], databaseConfig);
   try {
     const values = [];
 
-    const query = buildQuery(databaseConfig, values);
+    const query = buildQuery(databaseConfig, values, options);
     const result = await pool.query(query, values);
     return result;
   } catch (error) {
