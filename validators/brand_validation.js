@@ -1,28 +1,31 @@
 const { body, param } = require("express-validator");
 
 const validatorMiddleware = require("./../middlewares/validation_middleware");
+const filterUnknownFields = require("./../middlewares/filterUnknownFields");
 
-exports.createBrandValidator = [
-  body("name")
+const brandFields = ["brand_name"];
+
+const brandValidator = [
+  body("brand_name")
     .notEmpty()
     .trim()
     .toLowerCase()
     .withMessage("Brand must has name"),
-  validatorMiddleware,
 ];
 
 exports.getBrandValidator = [
-  param("id").notEmpty().isNumeric().withMessage("Invalid ID"),
+  param("id").notEmpty().isNumeric().withMessage("Invalid brand ID"),
+  validatorMiddleware,
+];
+
+exports.createBrandValidator = [
+  filterUnknownFields(brandFields),
+  [...brandValidator],
   validatorMiddleware,
 ];
 
 exports.updateBrandValidator = [
-  param("id").notEmpty().isNumeric().withMessage("Invalid ID"),
-  body("name")
-    .optional()
-    .notEmpty()
-    .trim()
-    .toLowerCase()
-    .withMessage("Brand must has name"),
+  filterUnknownFields(brandFields),
+  [...brandValidator].map((rule) => rule.optional()),
   validatorMiddleware,
 ];

@@ -2,6 +2,7 @@ const slug = require("slugify");
 
 const categoryModel = require("./../models/category_model");
 const ApiFeatures = require("./../utils/apiFeatures");
+const buildReqBody = require("./../utils/buildReqBody");
 
 const defaultImage = (category) => {
   if (category && category.category_image === undefined) {
@@ -11,10 +12,13 @@ const defaultImage = (category) => {
 
 exports.createCategory = async (req) => {
   try {
-    const catReq = {
-      category_name: req.body.name.trim(),
-      category_slug: slug(req.body.name).toLowerCase(),
-    };
+    // const catReq = {
+    //   category_name: req.body.name.trim(),
+    //   category_slug: slug(req.body.name).toLowerCase(),
+    // };
+
+    let catReq = buildReqBody(req.body);
+    catReq["category_slug"] = slug(catReq["category_name"].toLowerCase());
 
     const category = await categoryModel.create(catReq);
     defaultImage(category);
@@ -56,13 +60,19 @@ exports.getAllCategories = async (req) => {
 };
 
 exports.updateCategoryById = async (req) => {
-  let category = {
-    category_id: req.params.id,
-  };
-  if (req.body.name) {
-    category.category_name = req.body.name.trim();
-    category.category_slug = slug(req.body.name.toLowerCase());
+  let category = buildReqBody(req.body);
+  category["category_id"] = req.params.id;
+  if (category["category_name"]) {
+    category["category_slug"] = slug(category["category_name"].toLowerCase());
   }
+
+  // let category = {
+  //   category_id: req.params.id,
+  // };
+  // if (req.body.name) {
+  //   category.category_name = req.body.name.trim();
+  //   category.category_slug = slug(req.body.name.toLowerCase());
+  // }
 
   const newCategory = await categoryModel.updateById(category);
   if (newCategory && !newCategory.category_image) {

@@ -1,6 +1,16 @@
 const { param, body } = require("express-validator");
 
 const validatorMiddleware = require("../middlewares/validation_middleware");
+const filterUnknownFields = require("./../middlewares/filterUnknownFields");
+
+const categoryFields = ["category_name"];
+const categoryValidator = [
+  body("category_name")
+    .notEmpty()
+    .toLowerCase()
+    .trim()
+    .withMessage("Category must has name"),
+];
 
 exports.categoryIdValidator = [
   param("id").isNumeric().withMessage("Invalid category ID"),
@@ -8,17 +18,13 @@ exports.categoryIdValidator = [
 ];
 
 exports.createCategoryValidator = [
-  body("name").notEmpty().toLowerCase().withMessage("Category must has name"),
+  filterUnknownFields(categoryFields),
+  [...categoryValidator],
   validatorMiddleware,
 ];
 
 exports.updateCategoryValidator = [
-  param("id").isNumeric().withMessage("Invalid category ID"),
-  body("name")
-    .optional()
-    .notEmpty()
-    .toLowerCase()
-    .trim()
-    .withMessage("Category must has name"),
+  filterUnknownFields(categoryFields),
+  [...categoryValidator].map((rule) => rule.optional()),
   validatorMiddleware,
 ];

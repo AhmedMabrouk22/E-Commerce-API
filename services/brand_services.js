@@ -2,13 +2,17 @@ const slug = require("slugify");
 
 const brandModel = require("./../models/brand_model");
 const ApiFeatures = require("./../utils/apiFeatures");
+const buildReqBody = require("./../utils/buildReqBody");
 
 exports.createBrand = async (req) => {
   try {
-    const brand = {
-      brand_name: req.body.name,
-      brand_slug: slug(req.body.name.toLowerCase()),
-    };
+    // const brand = {
+    //   brand_name: req.body.name,
+    //   brand_slug: slug(req.body.name.toLowerCase()),
+    // };
+
+    let brand = buildReqBody(req.body);
+    brand["brand_slug"] = slug(brand["brand_name"].toLowerCase());
 
     const result = await brandModel.create(brand);
     return result;
@@ -47,14 +51,15 @@ exports.getAllBrands = async (req) => {
 };
 
 exports.updateBrandById = async (req) => {
-  let brand = {
-    brand_id: req.params.id,
-  };
-
-  if (req.body.name) {
-    brand.brand_name = req.body.name;
-    brand.brand_slug = slug(req.body.name.toLowerCase());
+  let brand = buildReqBody(req.body);
+  brand["brand_id"] = req.params.id;
+  if (brand["brand_name"]) {
+    brand["brand_slug"] = slug(brand["brand_name"].toLowerCase());
   }
+  // if (req.body.name) {
+  //   brand.brand_name = req.body.name;
+  //   brand.brand_slug = slug(req.body.name.toLowerCase());
+  // }
 
   const newBrand = await brandModel.updateById(brand);
 

@@ -16,7 +16,11 @@ router
 
 router
   .route("/:id")
-  .patch(updateSubCategoryValidator, subCategoryController.updateSubCategory)
+  .patch(
+    subCategoryIdValidator,
+    updateSubCategoryValidator,
+    subCategoryController.updateSubCategory
+  )
   .get(subCategoryIdValidator, subCategoryController.getSubCategory)
   .delete(subCategoryIdValidator, subCategoryController.deleteSubCategory);
 

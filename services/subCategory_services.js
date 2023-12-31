@@ -2,14 +2,22 @@ const slug = require("slugify");
 
 const subCategoryModel = require("./../models/subCategory_model");
 const ApiFeatures = require("./../utils/apiFeatures");
+const buildReqBody = require("./../utils/buildReqBody");
 
 exports.createSubCategory = async (req) => {
   try {
-    const subCategory = {
-      subCategory_name: req.body.subcategory_name,
-      subCategory_slug: slug(req.body.subcategory_name.toLowerCase()),
-      category_id: req.params.categoryId * 1,
-    };
+    // const subCategory = {
+    //   subCategory_name: req.body.subcategory_name,
+    //   subCategory_slug: slug(req.body.subcategory_name.toLowerCase()),
+    //   category_id: req.params.categoryId * 1,
+    // };
+
+    let subCategory = buildReqBody(req.body);
+    subCategory["subCategory_slug"] = slug(
+      subCategory["subCategory_name"].toLowerCase()
+    );
+    subCategory["category_id"] = req.params.categoryId * 1;
+
     const newSubCategory = await subCategoryModel.create(subCategory);
     return newSubCategory;
   } catch (error) {
@@ -19,19 +27,25 @@ exports.createSubCategory = async (req) => {
 
 exports.updateSubCategory = async (req) => {
   try {
-    let subCategory = {
-      subcategory_id: req.params.id,
-    };
-    if (req.body.subcategory_name) {
-      subCategory["subCategory_name"] = req.body.subcategory_name;
+    // let subCategory = {
+    //   subcategory_id: req.params.id,
+    // };
+    // if (req.body.subcategory_name) {
+    //   subCategory["subCategory_name"] = req.body.subcategory_name;
+    //   subCategory["subCategory_slug"] = slug(
+    //     req.body.subcategory_name.toLowerCase()
+    //   );
+    // }
+
+    let subCategory = buildReqBody(req.body);
+
+    if (subCategory["subCategory_name"]) {
       subCategory["subCategory_slug"] = slug(
-        req.body.subcategory_name.toLowerCase()
+        subCategory["subCategory_name"].toLowerCase()
       );
     }
 
-    if (req.body.category_id) {
-      subCategory.category_id = req.body.category_id;
-    }
+    subCategory["subcategory_id"] = req.params.id;
 
     const result = await subCategoryModel.updateById(subCategory);
     return result;

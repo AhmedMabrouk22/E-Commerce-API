@@ -19,7 +19,11 @@ router
 router
   .route("/:id")
   .get(categoryIdValidator, categoryController.getCategoryById)
-  .patch(updateCategoryValidator, categoryController.UpdateCategory)
+  .patch(
+    categoryIdValidator,
+    updateCategoryValidator,
+    categoryController.UpdateCategory
+  )
   .delete(categoryIdValidator, categoryController.deleteCategory);
 
 module.exports = router;
