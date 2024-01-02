@@ -13,65 +13,73 @@ const productFields = [
   "product_sub_categories",
 ];
 
+// Common validation function for product fields
+const validateProductField = (field, optional = false) => {
+  let validationChain = body(field)
+    .notEmpty()
+    .withMessage(`${field} is required`);
+  if (optional) validationChain = validationChain.optional();
+  return validationChain;
+};
+
 exports.IDProductValidator = [
   param("id").isNumeric().notEmpty().withMessage("Invalid ID"),
   validatorMiddleware,
 ];
 
-const productValidator = [
-  body("product_title")
-    .notEmpty()
-    .trim()
-    .toLowerCase()
-    .withMessage("Product title is required"),
-  body("product_description")
-    .notEmpty()
-    .trim()
-    .toLowerCase()
-    .withMessage("Product description is required"),
-  body("product_quantity")
-    .notEmpty()
-    .withMessage("Product quantity is required")
+exports.createProductValidator = [
+  filterUnknownFields(productFields),
+  validateProductField("product_title").toLowerCase().trim(),
+  validateProductField("product_description").trim(),
+  validateProductField("product_quantity")
     .isInt({ min: 1 })
     .withMessage("Invalid product quantity value"),
-  body("product_price")
-    .notEmpty()
-    .withMessage("Product price is required")
+  validateProductField("product_price")
     .isNumeric({ min: 1 })
     .withMessage("Invalid product price value"),
-  body("category_id")
-    .notEmpty()
-    .withMessage("Product category_id is required")
+  validateProductField("category_id")
     .isInt()
     .withMessage("Invalid category ID"),
-  body("brand_id")
-    .notEmpty()
-    .withMessage("Product brand_id is required")
-    .isInt()
-    .withMessage("Invalid brand ID"),
-  body("product_sub_categories")
-    .notEmpty()
-    .withMessage("Product subCategories is required")
+  validateProductField("brand_id").isInt().withMessage("Invalid brand ID"),
+  validateProductField("product_sub_categories")
     .isArray({
       min: 1,
     })
     .withMessage(
       "Invalid product subCategories value and product must be has one or more subCategory"
     ),
-  body("product_sub_categories.*")
-    .notEmpty()
+  validateProductField("product_sub_categories.*")
     .isInt()
     .withMessage("Product subCategories IDs must be numbers"),
-];
-
-exports.createProductValidator = [
-  filterUnknownFields(productFields),
-  [...productValidator],
   validatorMiddleware,
 ];
 
 exports.updateProductValidator = [
   filterUnknownFields(productFields),
-  [...productValidator].map((rule) => rule.optional()),
+  validateProductField("product_title", true).toLowerCase().trim(),
+  validateProductField("product_description", true).trim(),
+  validateProductField("product_quantity", true)
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("Invalid product quantity value"),
+  validateProductField("product_price", true)
+    .isNumeric({ min: 1 })
+    .withMessage("Invalid product price value"),
+  validateProductField("category_id", true)
+    .isInt()
+    .withMessage("Invalid category ID"),
+  validateProductField("brand_id", true)
+    .isInt()
+    .withMessage("Invalid brand ID"),
+  validateProductField("product_sub_categories", true)
+    .isArray({
+      min: 1,
+    })
+    .withMessage(
+      "Invalid product subCategories value and product must be has one or more subCategory"
+    ),
+  validateProductField("product_sub_categories.*")
+    .isInt()
+    .withMessage("Product subCategories IDs must be numbers"),
   validatorMiddleware,
 ];

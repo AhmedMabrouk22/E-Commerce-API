@@ -4,13 +4,15 @@ const validatorMiddleware = require("../middlewares/validation_middleware");
 const filterUnknownFields = require("./../middlewares/filterUnknownFields");
 
 const subCategoryFields = ["subCategory_name"];
-const subCategoryValidator = [
-  body("subcategory_name")
+
+// Common validation function for subCategory fields
+const validateSubCategoryField = (field, optional = false) => {
+  let validationChain = body(field)
     .notEmpty()
-    .trim()
-    .toLowerCase()
-    .withMessage("subCategory must has name"),
-];
+    .withMessage(`${field} is required`);
+  if (optional) validationChain = validationChain.optional();
+  return validationChain;
+};
 
 exports.subCategoryIdValidator = [
   param("id").notEmpty().isNumeric().withMessage("Invalid subCategory ID"),
@@ -24,13 +26,13 @@ exports.createSubCategoryValidator = [
     .withMessage("subCategory must belong to category")
     .isNumeric()
     .withMessage("Please add valid ID"),
-  [...subCategoryValidator],
+  validateSubCategoryField("subcategory_name").trim().toLowerCase(),
   validatorMiddleware,
 ];
 
 exports.updateSubCategoryValidator = [
   filterUnknownFields([[...subCategoryFields], "category_id"]),
-  [...subCategoryValidator].map((rule) => rule.optional()),
+  validateSubCategoryField("subcategory_name", true).trim().toLowerCase(),
   body("category_id").optional().isNumeric().withMessage("Invalid Category ID"),
   validatorMiddleware,
 ];
