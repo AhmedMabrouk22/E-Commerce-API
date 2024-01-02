@@ -3,6 +3,7 @@ const slug = require("slugify");
 const categoryModel = require("./../models/category_model");
 const ApiFeatures = require("./../utils/apiFeatures");
 const buildReqBody = require("./../utils/buildReqBody");
+const fileHandler = require("./../utils/file");
 
 const defaultImage = (category) => {
   if (category && category.category_image === undefined) {
@@ -66,22 +67,37 @@ exports.updateCategoryById = async (req) => {
     category["category_slug"] = slug(category["category_name"].toLowerCase());
   }
 
-  // let category = {
-  //   category_id: req.params.id,
-  // };
-  // if (req.body.name) {
-  //   category.category_name = req.body.name.trim();
-  //   category.category_slug = slug(req.body.name.toLowerCase());
-  // }
+  let imagePath;
+  if (req.body.category_image) {
+    const image = await categoryModel.findById({
+      fields: ["category_image"],
+      filter: { category_id: req.params.id },
+    });
+    if (image) {
+      imagePath = image["category_image"];
+    }
+  }
 
   const newCategory = await categoryModel.updateById(category);
-  if (newCategory && !newCategory.category_image) {
-    defaultImage(newCategory);
+  // if (newCategory && !newCategory.category_image) {
+  //   defaultImage(newCategory);
+  // }
+
+  if (!newCategory) {
+    fileHandler.deleteFile(req.body.category_image);
+  }
+
+  if (imagePath) {
+    fileHandler.deleteFile(imagePath);
   }
 
   return newCategory;
 };
 
 exports.deleteCategoryById = async (category_id) => {
-  return await categoryModel.deleteById(category_id);
+  const category = await categoryModel.deleteById(category_id);
+  if (category) {
+    fileHandler.deleteFile(category["category_image"]);
+  }
+  return category;
 };

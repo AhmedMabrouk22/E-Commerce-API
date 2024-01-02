@@ -4,6 +4,5 @@ module.exports = (allowedFields) => (req, res, next) => {
       delete req.body[field];
     }
   });
-
   next();
 };

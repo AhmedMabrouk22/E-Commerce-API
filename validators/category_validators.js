@@ -21,8 +21,8 @@ exports.categoryIdValidator = [
 
 exports.createCategoryValidator = [
   filterUnknownFields(categoryFields),
-  validateCategoryField("category_name", false).trim().toLowerCase(),
-  validateCategoryField("category_image", false).trim(),
+  validateCategoryField("category_name").trim().toLowerCase(),
+  validateCategoryField("category_image").trim(),
   validatorMiddleware,
 ];
 

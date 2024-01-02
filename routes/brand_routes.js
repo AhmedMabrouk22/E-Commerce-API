@@ -11,13 +11,23 @@ const router = express.Router();
 
 router
   .route("/")
-  .post(createBrandValidator, brandController.createBrand)
+  .post(
+    brandController.uploadBrandImage,
+    brandController.resizeImage,
+    createBrandValidator,
+    brandController.createBrand
+  )
   .get(brandController.getBrands);
 
 router
   .route("/:id")
   .get(getBrandValidator, brandController.getBrand)
-  .patch(updateBrandValidator, brandController.updateBrand)
+  .patch(
+    brandController.uploadBrandImage,
+    brandController.resizeImage,
+    updateBrandValidator,
+    brandController.updateBrand
+  )
   .delete(getBrandValidator, brandController.deleteBrand);
 
 module.exports = router;

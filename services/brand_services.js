@@ -3,6 +3,7 @@ const slug = require("slugify");
 const brandModel = require("./../models/brand_model");
 const ApiFeatures = require("./../utils/apiFeatures");
 const buildReqBody = require("./../utils/buildReqBody");
+const fileHandler = require("./../utils/file");
 
 exports.createBrand = async (req) => {
   try {
@@ -56,16 +57,33 @@ exports.updateBrandById = async (req) => {
   if (brand["brand_name"]) {
     brand["brand_slug"] = slug(brand["brand_name"].toLowerCase());
   }
-  // if (req.body.name) {
-  //   brand.brand_name = req.body.name;
-  //   brand.brand_slug = slug(req.body.name.toLowerCase());
-  // }
 
+  let brandImagePath;
+  if (req.body.brand_image) {
+    const image = await brandModel.findById({
+      fields: ["brand_image"],
+      filter: { brand_id: req.params.id },
+    });
+    if (image) {
+      brandImagePath = image["brand_image"];
+    }
+  }
   const newBrand = await brandModel.updateById(brand);
 
+  if (!newBrand) {
+    fileHandler.deleteFile(req.body.brand_image);
+  }
+
+  if (brandImagePath) {
+    fileHandler.deleteFile(brandImagePath);
+  }
   return newBrand;
 };
 
 exports.deleteBrandById = async (brand_id) => {
-  return await brandModel.deleteById(brand_id);
+  const brand = await brandModel.deleteById(brand_id);
+  if (brand) {
+    fileHandler.deleteFile(brand["brand_image"]);
+  }
+  return brand;
 };

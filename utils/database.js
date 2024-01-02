@@ -148,7 +148,7 @@ exports.delete = async (
   try {
     const values = [];
     const whereClause = buildWhereClause(databaseConfig.where, values);
-    const query = `DELETE FROM ${databaseConfig.table} ${whereClause}`;
+    const query = `DELETE FROM ${databaseConfig.table} ${whereClause} RETURNING *`;
     const result = await pool.query(query, values);
     return result;
   } catch (error) {

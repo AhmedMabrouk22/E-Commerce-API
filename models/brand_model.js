@@ -1,5 +1,6 @@
 const pool = require("./../config/db");
 const DatabaseQuery = require("./../utils/database");
+const fileHandler = require("./../utils/file");
 
 exports.create = async (brand) => {
   try {
@@ -14,6 +15,7 @@ exports.create = async (brand) => {
     );
     return result.rows[0];
   } catch (error) {
+    fileHandler.deleteFile(brand.brand_image);
     throw error;
   }
 };
@@ -47,14 +49,16 @@ exports.findById = async (config) => {
 
 exports.updateById = async (brand) => {
   try {
+    const fieldsAndValues = DatabaseQuery.buildFieldsAndValues(brand);
+
     const result = await DatabaseQuery.update(
       pool,
       {
         table: "brands",
         where: { brand_id: brand.brand_id },
-        fields: ["brand_name", "brand_slug"],
+        fields: fieldsAndValues[0],
       },
-      [brand.brand_name, brand.brand_slug]
+      fieldsAndValues[1]
     );
     return result.rows[0];
   } catch (error) {
@@ -68,7 +72,7 @@ exports.deleteById = async (brand_id) => {
       where: { brand_id },
       table: "brands",
     });
-    return result.rowCount;
+    return result.rows[0];
   } catch (error) {
     throw error;
   }

@@ -1,9 +1,7 @@
 const sharp = require("sharp");
 
 const categoryServices = require("./../services/category_services");
-const httpStatus = require("./../utils/httpStatusText");
 const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/appError");
 const factor = require("./handlersFactory");
 const { uploadSingleImage } = require("./../middlewares/uploadImageMiddleware");
 const pathHandler = require("./../utils/paths");
