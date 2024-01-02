@@ -52,7 +52,7 @@ exports.getAllCategories = async (req) => {
       .sort()
       .getApiConfig();
     const categories = await categoryModel.find(api);
-    categories.forEach((elm) => defaultImage(elm));
+    // categories.forEach((elm) => defaultImage(elm));
     return categories;
   } catch (error) {
     throw error;

@@ -1,4 +1,6 @@
 const express = require("express");
+const multer = require("multer");
+const sharp = require("sharp");
 
 const categoryController = require("./../controllers/category_controller");
 const {
@@ -14,12 +16,19 @@ router.use("/:categoryId/subcategories", subCategoryRouter);
 
 router
   .route("/")
-  .post(createCategoryValidator, categoryController.createCategory)
+  .post(
+    categoryController.uploadCategoryImage,
+    categoryController.resizeImage,
+    createCategoryValidator,
+    categoryController.createCategory
+  )
   .get(categoryController.getAllCategories);
 router
   .route("/:id")
   .get(categoryIdValidator, categoryController.getCategoryById)
   .patch(
+    categoryController.uploadCategoryImage,
+    categoryController.resizeImage,
     categoryIdValidator,
     updateCategoryValidator,
     categoryController.UpdateCategory
