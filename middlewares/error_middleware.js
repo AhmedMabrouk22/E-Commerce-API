@@ -63,6 +63,14 @@ module.exports = (err, req, res, next) => {
     if (error.code === "23505") error = handleDuplicateDBError(error);
     if (error.code === "42703") error = handleColumnDBError(error);
     if (error.code === "23503") error = foreignKeyDBError(error);
+    if (
+      error.code === "LIMIT_UNEXPECTED_FILE" &&
+      error.field === "product_images"
+    )
+      error = new AppError(
+        `product_images must has at least 1 image and at most 5 images`,
+        400
+      );
     sendToProd(error, res);
   }
 };

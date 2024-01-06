@@ -8,6 +8,8 @@ const productFields = [
   "product_description",
   "product_quantity",
   "product_price",
+  "product_cover",
+  "product_images",
   "category_id",
   "brand_id",
   "product_sub_categories",
@@ -37,6 +39,17 @@ exports.createProductValidator = [
   validateProductField("product_price")
     .isNumeric({ min: 1 })
     .withMessage("Invalid product price value"),
+  validateProductField("product_cover").trim(),
+  validateProductField("product_images")
+    .isArray({
+      min: 1,
+      max: 5,
+    })
+    .withMessage("Invalid product_images value"),
+  validateProductField("product_images.*")
+    .isString()
+    .withMessage("Invalid product images value")
+    .trim(),
   validateProductField("category_id")
     .isInt()
     .withMessage("Invalid category ID"),
@@ -65,6 +78,14 @@ exports.updateProductValidator = [
   validateProductField("product_price", true)
     .isNumeric({ min: 1 })
     .withMessage("Invalid product price value"),
+  validateProductField("product_cover", true).trim(),
+  validateProductField("product_images", true).isArray({
+    min: 1,
+  }),
+  validateProductField("product_images.*")
+    .isString()
+    .withMessage("Invalid product images value")
+    .trim(),
   validateProductField("category_id", true)
     .isInt()
     .withMessage("Invalid category ID"),

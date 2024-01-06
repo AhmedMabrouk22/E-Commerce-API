@@ -3,7 +3,7 @@ const sharp = require("sharp");
 const brandServices = require("./../services/brand_services");
 const catchAsync = require("./../utils/catchAsync");
 const factor = require("./handlersFactory");
-const { uploadSingleImage } = require("./../middlewares/uploadImageMiddleware");
+const { uploadSingleImage } = require("../middlewares/uploadImage_middleware");
 const pathHandler = require("./../utils/paths");
 
 exports.uploadBrandImage = uploadSingleImage("brand_image");
@@ -19,7 +19,7 @@ exports.resizeImage = catchAsync(async (req, res, next) => {
       .toFile(`./${filepath}`);
 
     req.body.brand_image = filename;
-    req.file.filePath = filepath;
+    req.file.fileName = filename;
   }
   next();
 });

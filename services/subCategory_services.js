@@ -6,12 +6,6 @@ const buildReqBody = require("./../utils/buildReqBody");
 
 exports.createSubCategory = async (req) => {
   try {
-    // const subCategory = {
-    //   subCategory_name: req.body.subcategory_name,
-    //   subCategory_slug: slug(req.body.subcategory_name.toLowerCase()),
-    //   category_id: req.params.categoryId * 1,
-    // };
-
     let subCategory = buildReqBody(req.body);
     subCategory["subCategory_slug"] = slug(
       subCategory["subCategory_name"].toLowerCase()

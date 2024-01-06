@@ -7,10 +7,14 @@ module.exports = (req, res, next) => {
   const error = validationResult(req);
   if (!error.isEmpty()) {
     if (req.file) {
-      const filePath = req.file.filePath;
-      fileHandler.deleteFile(`./${filePath}`);
+      const fileName = req.file.fileName;
+      fileHandler.deleteFile(fileName);
     }
-
+    if (req.files) {
+      for (const elm of req.files.filesNames) {
+        fileHandler.deleteFile(elm);
+      }
+    }
     return next(new AppError(error.array()[0].msg, 400));
   }
   next();

@@ -1,6 +1,7 @@
 const AppError = require("../utils/appError");
 const pool = require("./../config/db");
 const DatabaseQuery = require("./../utils/database");
+const fileHandler = require("./../utils/file");
 
 // Check if subCategory belong to category
 const isBelongToCategory = async (client, category_id, subCategory_id) => {
@@ -98,6 +99,82 @@ const updateSubCategories = async (client, product, subCategories) => {
   }
 };
 
+// add images
+const addImage = async (client, images, product_id) => {
+  try {
+    for (const image of images) {
+      const result = await DatabaseQuery.insert(
+        client,
+        {
+          fields: ["product_id", "image_path"],
+          table: "product_images",
+        },
+        [product_id, image]
+      );
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+const deleteImages = async (client, images, product_id) => {
+  try {
+    for (const elm of images) {
+      const res = await DatabaseQuery.delete(client, {
+        table: "product_images",
+        where: { image_path: elm, product_id },
+      });
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getProductImage = async (pool, product_id) => {
+  const result = await DatabaseQuery.select(pool, {
+    fields: ["image_path"],
+    table: "product_images",
+    where: { product_id },
+  });
+  return result.rows;
+};
+
+const updateProductImages = async (client, product_id, product_images) => {
+  try {
+    // 1) get current product images
+    const images = await getProductImage(client, product_id);
+    const imagesMap = new Map();
+    for (const image of images) {
+      imagesMap.set(image.image_path, true);
+    }
+    // 2) select new product images
+    const add = [];
+    const remove = [];
+
+    for (const elm of product_images) {
+      if (imagesMap.has(elm) === false) {
+        add.push(elm);
+      } else {
+        imagesMap.delete(elm);
+      }
+    }
+
+    imagesMap.forEach((value, key) => {
+      remove.push(key);
+    });
+
+    // Delete Product_images
+    await deleteImages(client, remove, product_id);
+
+    // Add new Product images
+    await addImage(client, add, product_id);
+
+    return remove;
+  } catch (error) {
+    throw error;
+  }
+};
+
 exports.create = async (product) => {
   const client = await pool.connect();
   try {
@@ -107,6 +184,7 @@ exports.create = async (product) => {
     // 1) Insert product
     let obj = { ...product };
     delete obj["product_sub_categories"];
+    delete obj["product_images"];
     const fieldsAndValue = DatabaseQuery.buildFieldsAndValues(obj);
     let newProduct = await DatabaseQuery.insert(
       client,
@@ -126,11 +204,17 @@ exports.create = async (product) => {
       product.category_id
     );
 
+    // 3) Insert product_id, and product_images into product_images table
+    await addImage(client, product["product_images"], product_id);
+
     await client.query("COMMIT");
     newProduct.rows[0].subCategories = product.product_sub_categories;
+    newProduct.rows[0].product_images = product.product_images;
     return newProduct.rows[0];
   } catch (error) {
     await client.query("ROLLBACK");
+    const images = [product["product_cover"], ...product["product_images"]];
+    fileHandler.deleteFiles(images);
     throw error;
   } finally {
     await client.end();
@@ -166,11 +250,20 @@ exports.findById = async (config) => {
 
 exports.deleteById = async (product_id) => {
   try {
-    const result = await DatabaseQuery.delete(pool, {
+    const images = getProductImage(pool, product_id);
+
+    let result = await DatabaseQuery.delete(pool, {
       table: "products",
       where: { product_id },
     });
-    return result.rowCount;
+
+    if (result.rows[0]) {
+      result.rows[0].product_images = [];
+      for (const image of images) {
+        result.rows[0].product_images.push(image.image_path);
+      }
+    }
+    return result.rows[0];
   } catch (error) {
     throw error;
   }
@@ -186,7 +279,7 @@ exports.updateById = async (product) => {
 
     delete obj["product_id"];
     delete obj["product_sub_categories"];
-
+    delete obj["product_images"];
     const fieldsAndValues = DatabaseQuery.buildFieldsAndValues(obj);
     let updatedProduct = await DatabaseQuery.update(
       client,
@@ -210,11 +303,29 @@ exports.updateById = async (product) => {
       );
     }
 
+    // 3) Update product images
+    let oldImages = [];
+    if (product.product_images) {
+      oldImages = await updateProductImages(
+        client,
+        product.product_id,
+        product.product_images
+      );
+    }
     await client.query("COMMIT");
+
+    // delete old images form files
+    fileHandler.deleteFiles(oldImages);
+
     updatedProduct.rows[0].subCategories = product.product_sub_categories;
+    updatedProduct.rows[0].product_images = product.product_images;
     return updatedProduct.rows[0];
   } catch (error) {
     await client.query("ROLLBACK");
+    const images = [];
+    if (product.product_cover) images.push(product.product_cover);
+    if (product.product_images) images.push(...product.product_images);
+    fileHandler.deleteFiles(images);
     throw error;
   } finally {
     await client.end();

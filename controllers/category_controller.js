@@ -3,7 +3,9 @@ const sharp = require("sharp");
 const categoryServices = require("./../services/category_services");
 const catchAsync = require("../utils/catchAsync");
 const factor = require("./handlersFactory");
-const { uploadSingleImage } = require("./../middlewares/uploadImageMiddleware");
+const {
+  uploadSingleImage,
+} = require("./../middlewares/uploadImage_middleware");
 const pathHandler = require("./../utils/paths");
 
 exports.uploadCategoryImage = uploadSingleImage("category_image");
@@ -19,7 +21,9 @@ exports.resizeImage = catchAsync(async (req, res, next) => {
       .toFile(`./${filepath}`);
 
     req.body.category_image = filename;
-    req.file.filePath = filepath;
+    // i add req.file.fileName for when something wrong happen when validation middleware
+    // i will delete image
+    req.file.fileName = filename;
   }
   next();
 });

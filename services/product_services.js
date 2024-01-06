@@ -2,6 +2,8 @@ const slug = require("slugify");
 
 const productModel = require("./../models/product_model");
 const ApiFeatures = require("./../utils/apiFeatures");
+const buildReqBody = require("./../utils/buildReqBody");
+const fileHandler = require("./../utils/file");
 
 exports.createProduct = async (req) => {
   try {
@@ -19,13 +21,13 @@ exports.createProduct = async (req) => {
     //   product_sub_categories: req.body.product_sub_categories,
     // };
 
-    let product = {};
-    Object.entries(req.body).forEach(([key, val]) => {
-      product[`${key}`] = val;
-    });
+    let product = buildReqBody(req.body);
+    // let product = {};
+    // Object.entries(req.body).forEach(([key, val]) => {
+    //   product[`${key}`] = val;
+    // });
 
     product["product_slug"] = slug(req.body.product_title.toLowerCase());
-    product["product_cover"] = req.body.product_title;
     product["create_at"] = new Date(Date.now()).toISOString();
     product["update_at"] = new Date(Date.now()).toISOString();
 
@@ -66,25 +68,49 @@ exports.getAllProductById = async (req) => {
 };
 
 exports.deleteProductById = async (product_id) => {
-  return await productModel.deleteById(product_id);
+  const product = await productModel.deleteById(product_id);
+  if (product) {
+    fileHandler.deleteFiles([
+      product["product_cover"],
+      ...product["product_images"],
+    ]);
+  }
+  return product;
 };
 
 exports.updateProductById = async (req) => {
   try {
-    const id = req.params.id;
-    let product = {};
-
-    Object.entries(req.body).forEach(([key, val]) => {
-      product[`${key}`] = val;
-    });
+    let product = buildReqBody(req.body);
+    product["product_id"] = req.params.id;
 
     if (product["product_title"]) {
       product["product_slug"] = slug(product["product_title"].toLowerCase());
     }
-    product["product_id"] = id;
     product["update_at"] = new Date(Date.now()).toISOString();
 
+    let product_cover_image;
+    if (req.body.product_cover) {
+      const image = await productModel.findById({
+        fields: ["product_cover"],
+        filter: { product_id: req.params.id },
+      });
+      if (image) {
+        product_cover_image = image["product_cover"];
+      }
+    }
+
     const newProduct = await productModel.updateById(product);
+
+    if (!newProduct) {
+      const images = [];
+      if (newProduct.product_cover) images.push(newProduct.product_cover);
+      if (newProduct.product_images) images.push(...newProduct.product_images);
+      fileHandler.deleteFiles(images);
+    }
+
+    if (product_cover_image) {
+      fileHandler.deleteFile(product_cover_image);
+    }
     return newProduct;
   } catch (error) {
     throw error;

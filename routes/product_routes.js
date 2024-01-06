@@ -10,7 +10,12 @@ const {
 const router = express.Router();
 router
   .route("/")
-  .post(createProductValidator, productController.createProduct)
+  .post(
+    productController.uploadProductImages,
+    productController.resizeImage,
+    createProductValidator,
+    productController.createProduct
+  )
   .get(productController.getAllProducts);
 
 router
@@ -19,6 +24,8 @@ router
   .delete(IDProductValidator, productController.deleteProduct)
   .patch(
     IDProductValidator,
+    productController.uploadProductImages,
+    productController.resizeImage,
     updateProductValidator,
     productController.updateProduct
   );

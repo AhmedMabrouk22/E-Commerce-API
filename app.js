@@ -12,6 +12,7 @@ const AppError = require("./utils/appError");
 const app = express();
 
 // 1) Global middlewares
+app.use(express.static("./uploads"));
 app.use(express.json());
 
 // 2) Development logging

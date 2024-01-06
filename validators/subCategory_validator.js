@@ -26,13 +26,13 @@ exports.createSubCategoryValidator = [
     .withMessage("subCategory must belong to category")
     .isNumeric()
     .withMessage("Please add valid ID"),
-  validateSubCategoryField("subcategory_name").trim().toLowerCase(),
+  validateSubCategoryField("subCategory_name").trim().toLowerCase(),
   validatorMiddleware,
 ];
 
 exports.updateSubCategoryValidator = [
   filterUnknownFields([[...subCategoryFields], "category_id"]),
-  validateSubCategoryField("subcategory_name", true).trim().toLowerCase(),
+  validateSubCategoryField("subCategory_name", true).trim().toLowerCase(),
   body("category_id").optional().isNumeric().withMessage("Invalid Category ID"),
   validatorMiddleware,
 ];

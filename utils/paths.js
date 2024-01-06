@@ -7,4 +7,6 @@ exports.generatePath = (filename) => {
     return path.join(BASE_PATH, "categories", filename);
   else if (filename.startsWith("Brand"))
     return path.join(BASE_PATH, "brands", filename);
+  else if (filename.startsWith("Product"))
+    return path.join(BASE_PATH, "products", filename);
 };
