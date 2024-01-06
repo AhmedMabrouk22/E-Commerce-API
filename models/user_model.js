@@ -1,5 +1,6 @@
 const pool = require("../config/db");
 const DatabaseQuery = require("../utils/database");
+const fileHandler = require("./../utils/file");
 
 exports.signup = async (user) => {
   const client = await pool.connect();
@@ -29,6 +30,9 @@ exports.signup = async (user) => {
     return newUser.rows[0];
   } catch (error) {
     await client.query("ROLLBACK");
+    if (user.profile_image) {
+      fileHandler.deleteFile(user.profile_image);
+    }
     throw error;
   } finally {
     await client.end();

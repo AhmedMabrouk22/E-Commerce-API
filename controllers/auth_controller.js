@@ -1,6 +1,12 @@
+const sharp = require("sharp");
+
 const authServices = require("./../services/auth_services");
 const catchAsync = require("./../utils/catchAsync");
 const httpStatus = require("./../utils/httpStatusText");
+const {
+  uploadSingleImage,
+} = require("./../middlewares/uploadImage_middleware");
+const pathHandler = require("./../utils/paths");
 
 const createToken = (user, statusCode, res) => {
   const token = authServices.signToken(user.email);
@@ -19,6 +25,24 @@ const createToken = (user, statusCode, res) => {
       user,
     },
   });
+};
+
+exports.uploadProfileImage = uploadSingleImage("profile_image");
+exports.resizeImage = async (req, res, next) => {
+  if (req.file) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const filename = `User-${uniqueSuffix}.jpeg`;
+    const filepath = pathHandler.generatePath(filename);
+    await sharp(req.file.buffer)
+      .resize(400, 400)
+      .toFormat("jpeg")
+      .jpeg({ quality: 95 })
+      .toFile(`./${filepath}`);
+
+    req.body.profile_image = filename;
+    req.file.fileName = filename;
+  }
+  next();
 };
 
 exports.signup = catchAsync(async (req, res, next) => {

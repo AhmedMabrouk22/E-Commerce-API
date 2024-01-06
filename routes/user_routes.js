@@ -5,6 +5,12 @@ const { signupValidator } = require("./../validators/user_validators");
 
 const router = express.Router();
 
-router.post("/signup", signupValidator, authController.signup);
+router.post(
+  "/signup",
+  authController.uploadProfileImage,
+  authController.resizeImage,
+  signupValidator,
+  authController.signup
+);
 
 module.exports = router;
