@@ -58,11 +58,6 @@ CREATE TABLE IF NOT EXISTS cites (
 	city_name VARCHAR(255) NOT NULL UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS roles (
-	role_id SERIAL PRIMARY KEY,
-	role_name VARCHAR(100) CHECK(role_name IN ('user','admin','manager')) DEFAULT 'user'
-);
-
 CREATE TABLE IF NOT EXISTS users (
 	user_id BIGSERIAL PRIMARY KEY,
 	first_name VARCHAR(100) NOT NULL,
@@ -71,7 +66,7 @@ CREATE TABLE IF NOT EXISTS users (
 	password VARCHAR NOT NULL CHECK (LENGTH(password) >= 8),
 	phone_number VARCHAR(12),
 	image_profile TEXT,
-	role INT NOT NULL,
+	role_name VARCHAR(100) CHECK(role_name IN ('user','admin','manager')) DEFAULT 'user',
 	active BOOLEAN DEFAULT 'TRUE'
 );
 
