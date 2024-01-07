@@ -42,10 +42,24 @@ exports.signup = async (user) => {
 exports.findByEmail = async (email) => {
   try {
     const user = await DatabaseQuery.select(pool, {
-      fields: ["email"],
       table: "users",
       where: { email },
     });
+
+    return user.rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.getUserAuth = async (user_id) => {
+  try {
+    const user = await DatabaseQuery.select(pool, {
+      table: "user_auth",
+      where: { user_id },
+    });
+
+    // console.log(user);
 
     return user.rows[0];
   } catch (error) {

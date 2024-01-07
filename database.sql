@@ -65,17 +65,17 @@ CREATE TABLE IF NOT EXISTS users (
 	email VARCHAR(255) NOT NULL UNIQUE,
 	password VARCHAR NOT NULL CHECK (LENGTH(password) >= 8),
 	phone_number VARCHAR(12),
-	image_profile TEXT,
+	profile_image TEXT,
 	role_name VARCHAR(100) CHECK(role_name IN ('user','admin','manager')) DEFAULT 'user',
 	active BOOLEAN DEFAULT 'TRUE'
 );
 
 CREATE TABLE IF NOT EXISTS user_auth (
 	user_id BIGINT NOT NULL UNIQUE,
-    passwordChangedAt TIMESTAMP,
-	passwordResetCode VARCHAR(10),
-	passwordResetExpires TIMESTAMP,
-	passwordResetVerified BOOLEAN,
+    password_changed_at TIMESTAMP,
+	password_reset_code VARCHAR(10),
+	password_reset_expires TIMESTAMP,
+	password_reset_verified BOOLEAN,
 	CONSTRAINT user_auth_fk FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 

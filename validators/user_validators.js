@@ -41,3 +41,15 @@ exports.signupValidator = [
     .withMessage("Invalid phone number value"),
   validatorMiddleware,
 ];
+
+exports.loginValidator = [
+  filterUnknownFields(["email", "password"]),
+  validateUserField("email")
+    .trim()
+    .isEmail()
+    .withMessage("Invalid email value"),
+  validateUserField("password")
+    .isLength({ min: 8 })
+    .withMessage("password must be at least 8"),
+  validatorMiddleware,
+];

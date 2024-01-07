@@ -9,7 +9,7 @@ const {
 const pathHandler = require("./../utils/paths");
 
 const createToken = (user, statusCode, res) => {
-  const token = authServices.signToken(user.email);
+  const token = authServices.signToken(user.email, user.user_id);
   const cookieOptions = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
@@ -48,4 +48,10 @@ exports.resizeImage = async (req, res, next) => {
 exports.signup = catchAsync(async (req, res, next) => {
   const user = await authServices.signup(req);
   createToken(user, 201, res);
+});
+
+exports.login = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+  const user = await authServices.login(email, password);
+  createToken(user, 200, res);
 });
