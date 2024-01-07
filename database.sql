@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS user_auth (
 	user_id BIGINT NOT NULL UNIQUE,
-    password_changed_at TIMESTAMP,
+    password_changed_at BIGINT,
 	password_reset_code TEXT,
 	password_reset_expires BIGINT,
 	password_reset_verified BOOLEAN,
