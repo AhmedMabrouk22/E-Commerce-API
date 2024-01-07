@@ -1,7 +1,7 @@
-const { emit } = require("nodemon");
 const AppError = require("../utils/appError");
 const userModel = require("./../models/user_model");
-const authServices = require("./auth_services");
+const buildReqBody = require("./../utils/buildReqBody");
+const fileHandler = require("./../utils/file");
 
 exports.getUserByEmail = async (email) => {
   try {
@@ -16,6 +16,35 @@ exports.getUserByEmail = async (email) => {
       );
     }
     delete user["password"];
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.updateMe = async (req) => {
+  try {
+    const userReq = buildReqBody(req.body);
+
+    let user_image;
+    if (userReq.profile_image) {
+      const curUser = await userModel.findByEmail(req.user.email);
+      user_image = curUser.profile_image;
+    }
+
+    const user = await userModel.updateUser(
+      { user_id: req.user.user_id },
+      userReq
+    );
+
+    if (!user) {
+      fileHandler.deleteFile(userReq.profile_image);
+    }
+
+    if (user_image) {
+      fileHandler.deleteFile(user_image);
+    }
+
     return user;
   } catch (error) {
     throw error;

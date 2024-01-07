@@ -72,3 +72,18 @@ exports.changePasswordValidator = [
     .withMessage("password must be at least 8"),
   validatorMiddleware,
 ];
+
+exports.updateUserValidator = [
+  filterUnknownFields([
+    "first_name",
+    "last_name",
+    "profile_image",
+    "phone_number",
+  ]),
+  validateUserField("first_name", true).trim(),
+  validateUserField("last_name", true).trim(),
+  validateUserField("phone_number", true)
+    .isMobilePhone()
+    .withMessage("Invalid phone number value"),
+  validatorMiddleware,
+];

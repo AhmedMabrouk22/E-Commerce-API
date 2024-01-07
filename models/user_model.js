@@ -67,7 +67,7 @@ exports.findByID = async (id) => {
 
 exports.updateUser = async (filter, user) => {
   try {
-    const fieldsAndValues = DatabaseQuery(user);
+    const fieldsAndValues = DatabaseQuery.buildFieldsAndValues(user);
     const newUser = await DatabaseQuery.update(
       pool,
       {

@@ -1,11 +1,13 @@
 const express = require("express");
 
 const authController = require("./../controllers/auth_controller");
+const userController = require("./../controllers/user_controller");
 const {
   signupValidator,
   loginValidator,
   emailValidator,
   changePasswordValidator,
+  updateUserValidator,
 } = require("./../validators/user_validators");
 const { protect } = require("./../middlewares/auth_middleware");
 const router = express.Router();
@@ -27,4 +29,16 @@ router.post(
   protect,
   authController.changePassword
 );
+
+router
+  .route("/me")
+  .patch(
+    protect,
+    authController.uploadProfileImage,
+    authController.resizeImage,
+    updateUserValidator,
+    userController.updateMe
+  )
+  .get(protect, userController.getMe);
+
 module.exports = router;
