@@ -82,3 +82,13 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   const user = await authServices.resetPassword(user_id, password);
   createToken(user, 200, res);
 });
+
+exports.changePassword = catchAsync(async (req, res, next) => {
+  const { current_password, new_password } = req.body;
+  const user = await authServices.changePassword(
+    req.user.email,
+    new_password,
+    current_password
+  );
+  createToken(user, 200, res);
+});

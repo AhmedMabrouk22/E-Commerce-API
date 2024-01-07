@@ -26,9 +26,8 @@ exports.changePasswordAfterToken = async (user_id, issued_at) => {
   try {
     const user = await userModel.getUserAuth({ user_id });
     if (user.password_changed_at) {
-      console.log("it not null");
       const changedTimestamp = parseInt(
-        user.password_changed_at.getTime() / 1000,
+        new Date(user.password_changed_at).getTime() / 1000,
         10
       );
 
@@ -177,6 +176,39 @@ exports.resetPassword = async (user_id, password) => {
     const newPassword = await bcrypt.hash(password, 12);
     const newUser = await userModel.updateUserPassword(
       { user_id: user_auth.user_id },
+      newPassword
+    );
+
+    delete newUser["password"];
+    return newUser;
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.changePassword = async (user_email, newPassword, curPassword) => {
+  try {
+    if (!newPassword || !curPassword) {
+      throw new AppError(`Please enter valid value`, 400);
+    }
+
+    // 1) Get user from database
+    const user = await userModel.findByEmail(user_email);
+    if (!user) {
+      throw new AppError(`this user is not found`, 404);
+    }
+
+    //  2) Check if POSTed current password is correct
+    if (!(await correctPassword(curPassword, user.password))) {
+      throw new AppError(`Your current password is wrong.`, 401);
+    }
+
+    // 3) Update password
+    newPassword = await bcrypt.hash(newPassword, 12);
+    const newUser = await userModel.updateUserPassword(
+      {
+        email: user_email,
+      },
       newPassword
     );
 

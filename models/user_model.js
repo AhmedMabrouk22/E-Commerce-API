@@ -108,6 +108,7 @@ exports.updateUserPassword = async (filter, password) => {
       [time]
     );
     await client.query(`COMMIT`);
+
     return user.rows[0];
   } catch (error) {
     await client.query(`ROLLBACK`);

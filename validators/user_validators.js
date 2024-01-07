@@ -8,7 +8,6 @@ const userFields = [
   "last_name",
   "email",
   "password",
-  "role_name",
   "phone_number",
   "profile_image",
 ];
@@ -60,5 +59,16 @@ exports.emailValidator = [
     .trim()
     .isEmail()
     .withMessage("Invalid email value"),
+  validatorMiddleware,
+];
+
+exports.changePasswordValidator = [
+  filterUnknownFields(["current_password", "new_password"]),
+  validateUserField("current_password")
+    .isLength({ min: 8 })
+    .withMessage("password must be at least 8"),
+  validateUserField("new_password")
+    .isLength({ min: 8 })
+    .withMessage("password must be at least 8"),
   validatorMiddleware,
 ];
