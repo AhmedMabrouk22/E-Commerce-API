@@ -73,8 +73,8 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS user_auth (
 	user_id BIGINT NOT NULL UNIQUE,
     password_changed_at TIMESTAMP,
-	password_reset_code VARCHAR(10),
-	password_reset_expires TIMESTAMP,
+	password_reset_code TEXT,
+	password_reset_expires BIGINT,
 	password_reset_verified BOOLEAN,
 	CONSTRAINT user_auth_fk FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );

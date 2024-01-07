@@ -53,3 +53,12 @@ exports.loginValidator = [
     .withMessage("password must be at least 8"),
   validatorMiddleware,
 ];
+
+exports.emailValidator = [
+  filterUnknownFields(["email"]),
+  validateUserField("email")
+    .trim()
+    .isEmail()
+    .withMessage("Invalid email value"),
+  validatorMiddleware,
+];

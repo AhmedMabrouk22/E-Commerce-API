@@ -55,3 +55,30 @@ exports.login = catchAsync(async (req, res, next) => {
   const user = await authServices.login(email, password);
   createToken(user, 200, res);
 });
+
+exports.forgetPassword = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+  await authServices.forgetPassword(email);
+  res.status(200).json({
+    status: httpStatus.SUCCESS,
+    message: "reset code send to email",
+  });
+});
+
+exports.verifyResetCode = catchAsync(async (req, res, next) => {
+  const { code } = req.body;
+  const user_id = await authServices.verifyResetCode(code);
+  res.status(200).json({
+    status: httpStatus.SUCCESS,
+    data: {
+      user_id: user_id,
+      message: "Reset code valid",
+    },
+  });
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  const { user_id, password } = req.body;
+  const user = await authServices.resetPassword(user_id, password);
+  createToken(user, 200, res);
+});
