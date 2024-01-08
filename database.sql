@@ -65,11 +65,6 @@ CREATE TABLE IF NOT EXISTS reviews (
 	CONSTRAINT review_user_fk FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS cites (
-	city_id SERIAL PRIMARY KEY,
-	city_name VARCHAR(255) NOT NULL UNIQUE
-);
-
 CREATE TABLE IF NOT EXISTS users (
 	user_id BIGSERIAL PRIMARY KEY,
 	first_name VARCHAR(100) NOT NULL,
@@ -92,18 +87,23 @@ CREATE TABLE IF NOT EXISTS user_auth (
 );
 
 CREATE TABLE IF NOT EXISTS user_address (
+	address_id BIGSERIAL PRIMARY KEY,
+	address_alias VARCHAR(100) NOT NULL,
 	user_id BIGINT NOT NULL,
-	city_id INT NOT NULL,
+	country VARCHAR(100) NOT NULL,
+	city VARCHAR(100) NOT NULL,
 	street TEXT NOT NULL,
+	postal_code INT NOT NULL,
     CONSTRAINT user_address_user_fk FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT user_address_city_fk FOREIGN KEY (city_id) REFERENCES cites(city_id) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT user_address_alias_unique UNIQUE(address_alias,user_id)
 );
 
-CREATE TABLE IF NOT EXISTS wishlists (
-	user_id BIGINT UNIQUE NOT NULL,
+CREATE TABLE IF NOT EXISTS wishlist (
+	user_id BIGINT NOT NULL,
 	product_id BIGINT NOT NULL,
 	CONSTRAINT wishlist_product_fk FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT wishlist_user_fk FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT wishlist_user_fk FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT wishlist_user_product_unique UNIQUE(user_id,product_id)
 );
 
 -- Create Views
@@ -125,3 +125,9 @@ ON S.subcategory_id = PS.subcategory_id
 LEFT JOIN product_images PI
 ON PI.product_id = P.product_id
 GROUP BY P.product_id;
+
+CREATE OR REPLACE VIEW product_wishlist_view
+AS
+SELECT P.product_id,P.product_title, P.product_slug, P.product_cover, P.product_price, W.user_id
+FROM products P INNER JOIN wishlist W
+ON P.product_id = W.product_id

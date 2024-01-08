@@ -9,6 +9,7 @@ const brandRouter = require("./routes/brand_routes");
 const productRouter = require("./routes/product_routes");
 const userRouter = require("./routes/user_routes");
 const reviewRouter = require("./routes/review_routes");
+const wishlistRouter = require("./routes/wishlist_routes");
 
 // Start express app
 const app = express();
@@ -32,6 +33,7 @@ app.use("/api/v1/brands", brandRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/reviews", reviewRouter);
+app.use("/api/v1/wishlist", wishlistRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

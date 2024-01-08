@@ -1,6 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const httpStatusText = require("../utils/httpStatusText");
 const userService = require("./../services/user_services");
+const authService = require("./../services/auth_services");
 const factor = require("./handlersFactory");
 
 // @desc    Update me (logged user)
@@ -33,7 +34,7 @@ exports.getUser = factor.getOne(userService.getUser);
 // @desc    Create user
 // @route   POST  /api/v1/users
 // @access  Private/Admin
-exports.createUser = factor.createOne(userService.createUser);
+exports.createUser = factor.createOne(authService.signup);
 
 // @desc    Update specific user
 // @route   PATCH /api/v1/users/:id

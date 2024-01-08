@@ -79,20 +79,23 @@ exports.getUser = async (req) => {
   }
 };
 
-exports.createUser = async (req) => {
-  try {
-    let userReq = buildReqBody(req.body);
-    let user = await userModel.signup(userReq);
-    if (user) delete user["password"];
-    return user;
-  } catch (error) {
-    throw error;
-  }
-};
+// exports.createUser = async (req) => {
+//   try {
+//     let userReq = buildReqBody(req.body);
+//     let user = await userModel.signup(userReq);
+//     if (user) delete user["password"];
+//     return user;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
 
 exports.deleteUser = async (req) => {
   try {
     const user_id = req.params.id;
+    if (user_id === req.user.user_id) {
+      throw new AppError(`Invalid operation, you cannot delete your self`, 400);
+    }
     const user = await userModel.deleteById(user_id);
     if (user) {
       fileHandler.deleteFile(user["profile_image"]);
