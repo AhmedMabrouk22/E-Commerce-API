@@ -65,6 +65,21 @@ exports.findByID = async (id) => {
   }
 };
 
+exports.find = async (config) => {
+  try {
+    const result = await DatabaseQuery.select(pool, {
+      fields: config.fields,
+      table: "users",
+      where: config.filter,
+      orderBy: config.sort,
+      limit: config.paginate,
+    });
+    return result.rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
 exports.updateUser = async (filter, user) => {
   try {
     const fieldsAndValues = DatabaseQuery.buildFieldsAndValues(user);
@@ -144,5 +159,32 @@ exports.updateUserAuth = async (user_id, data) => {
     return user.rows[0];
   } catch (error) {
     throw error;
+  }
+};
+
+exports.deleteById = async (user_id) => {
+  const client = await pool.connect();
+  try {
+    await client.query(`BEGIN`);
+
+    const result = await DatabaseQuery.delete(client, {
+      where: { user_id },
+      table: "users",
+    });
+
+    if (result.rowCount) {
+      const res = await DatabaseQuery.delete(client, {
+        where: { user_id },
+        table: "user_auth",
+      });
+    }
+
+    await client.query(`COMMIT`);
+    return result.rows[0];
+  } catch (error) {
+    await client.query(`ROLLBACK`);
+    throw error;
+  } finally {
+    client.release();
   }
 };

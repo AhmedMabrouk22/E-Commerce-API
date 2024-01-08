@@ -6,8 +6,8 @@ const {
   IDProductValidator,
   updateProductValidator,
 } = require("./../validators/product_validators");
-
 const reviewsRoute = require("./review_routes");
+const { protect, restrictTo } = require("./../middlewares/auth_middleware");
 
 const router = express.Router();
 
@@ -15,6 +15,8 @@ router.use("/:productId/reviews", reviewsRoute);
 router
   .route("/")
   .post(
+    protect,
+    restrictTo("admin", "manager"),
     productController.uploadProductImages,
     productController.resizeImage,
     createProductValidator,
@@ -25,8 +27,15 @@ router
 router
   .route("/:id")
   .get(IDProductValidator, productController.getAllProduct)
-  .delete(IDProductValidator, productController.deleteProduct)
+  .delete(
+    protect,
+    restrictTo("admin", "manager"),
+    IDProductValidator,
+    productController.deleteProduct
+  )
   .patch(
+    protect,
+    restrictTo("admin", "manager"),
     IDProductValidator,
     productController.uploadProductImages,
     productController.resizeImage,

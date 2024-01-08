@@ -9,6 +9,7 @@ const {
   updateCategoryValidator,
 } = require("../validators/category_validators");
 const subCategoryRouter = require("./subCategory_routes");
+const { protect, restrictTo } = require("./../middlewares/auth_middleware");
 
 const router = express.Router();
 
@@ -17,6 +18,8 @@ router.use("/:categoryId/subcategories", subCategoryRouter);
 router
   .route("/")
   .post(
+    protect,
+    restrictTo("admin", "manager"),
     categoryController.uploadCategoryImage,
     categoryController.resizeImage,
     createCategoryValidator,
@@ -27,12 +30,19 @@ router
   .route("/:id")
   .get(categoryIdValidator, categoryController.getCategoryById)
   .patch(
+    protect,
+    restrictTo("admin", "manager"),
     categoryController.uploadCategoryImage,
     categoryController.resizeImage,
     categoryIdValidator,
     updateCategoryValidator,
     categoryController.UpdateCategory
   )
-  .delete(categoryIdValidator, categoryController.deleteCategory);
+  .delete(
+    protect,
+    restrictTo("admin", "manager"),
+    categoryIdValidator,
+    categoryController.deleteCategory
+  );
 
 module.exports = router;

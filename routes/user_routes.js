@@ -8,8 +8,11 @@ const {
   emailValidator,
   changePasswordValidator,
   updateUserValidator,
+  userIdValidators,
+  changeRoleValidator,
+  createUserValidator,
 } = require("./../validators/user_validators");
-const { protect } = require("./../middlewares/auth_middleware");
+const { protect, restrictTo } = require("./../middlewares/auth_middleware");
 const router = express.Router();
 
 router.post(
@@ -40,5 +43,30 @@ router
     userController.updateMe
   )
   .get(protect, userController.getMe);
+
+router
+  .route("/")
+  .post(
+    protect,
+    restrictTo("admin"),
+    createUserValidator,
+    userController.createUser
+  )
+  .get(protect, restrictTo("admin"), userController.getAllUsers);
+router
+  .route("/:id")
+  .get(protect, restrictTo("admin"), userIdValidators, userController.getUser)
+  .patch(
+    protect,
+    restrictTo("admin"),
+    changeRoleValidator,
+    userController.updateUser
+  )
+  .delete(
+    protect,
+    restrictTo("admin"),
+    userIdValidators,
+    userController.deleteUser
+  );
 
 module.exports = router;

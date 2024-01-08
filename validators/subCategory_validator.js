@@ -3,7 +3,7 @@ const { param, body } = require("express-validator");
 const validatorMiddleware = require("../middlewares/validation_middleware");
 const filterUnknownFields = require("./../middlewares/filterUnknownFields");
 
-const subCategoryFields = ["subCategory_name"];
+const subCategoryFields = ["subCategory_name", "category_id"];
 
 // Common validation function for subCategory fields
 const validateSubCategoryField = (field, optional = false) => {
@@ -21,11 +21,9 @@ exports.subCategoryIdValidator = [
 
 exports.createSubCategoryValidator = [
   filterUnknownFields(subCategoryFields),
-  param("categoryId")
-    .notEmpty()
-    .withMessage("subCategory must belong to category")
+  validateSubCategoryField("category_id")
     .isNumeric()
-    .withMessage("Please add valid ID"),
+    .withMessage("Invalid category ID"),
   validateSubCategoryField("subCategory_name").trim().toLowerCase(),
   validatorMiddleware,
 ];

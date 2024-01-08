@@ -3,7 +3,14 @@ const httpStatusText = require("../utils/httpStatusText");
 const userService = require("./../services/user_services");
 const factor = require("./handlersFactory");
 
-exports.updateMe = factor.UpdateOne(userService.updateMe);
+// @desc    Update me (logged user)
+// @route   PATCH /api/v1/users/me
+// @access  Private/Protect
+exports.updateMe = factor.UpdateOne(userService.updateUser);
+
+// @desc    Get me (logged user)
+// @route   GET /api/v1/users/me
+// @access  Private/Protect
 exports.getMe = catchAsync(async (req, res, next) => {
   const email = req.user.email;
   const user = await userService.getUserByEmail(email);
@@ -12,3 +19,28 @@ exports.getMe = catchAsync(async (req, res, next) => {
     user,
   });
 });
+
+// @desc    Get list of users
+// @route   GET /api/v1/users
+// @access  Private/Admin
+exports.getAllUsers = factor.get(userService.getAllUsers);
+
+// @desc    Get user
+// @route   GET /api/v1/users/:id
+// @access  Private/Admin
+exports.getUser = factor.getOne(userService.getUser);
+
+// @desc    Create user
+// @route   POST  /api/v1/users
+// @access  Private/Admin
+exports.createUser = factor.createOne(userService.createUser);
+
+// @desc    Update specific user
+// @route   PATCH /api/v1/users/:id
+// @access  Private/Admin
+exports.updateUser = factor.UpdateOne(userService.updateUser);
+
+// @desc    Delete specific user
+// @route   DELETE /api/v1/users/:id
+// @access  Private/Admin
+exports.deleteUser = factor.deleteOne(userService.deleteUser);

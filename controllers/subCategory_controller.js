@@ -1,6 +1,11 @@
 const subCategoryServices = require("./../services/subCategory_services");
 const factor = require("./handlersFactory");
 
+exports.setCategoryIDToBody = (req, res, next) => {
+  if (!req.body.category_id) req.body.category_id = req.params.categoryId;
+  next();
+};
+
 // @desc    : Create new subCategory
 // @route   : POST  api/v1/subCategories
 // @access  : Private

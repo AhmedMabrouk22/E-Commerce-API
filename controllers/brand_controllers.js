@@ -26,7 +26,7 @@ exports.resizeImage = catchAsync(async (req, res, next) => {
 
 // @desc    : Create new Brand
 // @route   : POST  api/v1/brands
-// @access  : Private
+// @access  : Private/Admin-manager
 exports.createBrand = factor.createOne(brandServices.createBrand);
 
 // @desc    : Get all Brands
@@ -41,10 +41,10 @@ exports.getBrand = factor.getOne(brandServices.getBrandById);
 
 // @desc    : Update Brand
 // @route   : PATCH  api/v1/brands/:id
-// @access  : Private
+// @access  : Private/Admin-manager
 exports.updateBrand = factor.UpdateOne(brandServices.updateBrandById);
 
 // @desc    : Delete brand
 // @route   : DELETE  api/v1/brands/:id
-// @access  : Private
+// @access  : Private/Admin-manager
 exports.deleteBrand = factor.deleteOne(brandServices.deleteBrandById);

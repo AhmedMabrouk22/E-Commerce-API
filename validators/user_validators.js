@@ -31,10 +31,6 @@ exports.signupValidator = [
   validateUserField("password")
     .isLength({ min: 8 })
     .withMessage("password must be at least 8"),
-  validateUserField("role_name", true)
-    .trim()
-    .isIn(["user", "admin", "manager"])
-    .withMessage("Invalid role value, user must be user or admin or manager"),
   validateUserField("phone_number", true)
     .isMobilePhone()
     .withMessage("Invalid phone number value"),
@@ -85,5 +81,41 @@ exports.updateUserValidator = [
   validateUserField("phone_number", true)
     .isMobilePhone()
     .withMessage("Invalid phone number value"),
+  validatorMiddleware,
+];
+
+exports.userIdValidators = [
+  param("id").notEmpty().isInt().withMessage("Invalid user ID"),
+  validatorMiddleware,
+];
+
+exports.changeRoleValidator = [
+  param("id").notEmpty().isInt().withMessage("Invalid user ID"),
+  filterUnknownFields("role_name"),
+  validateUserField("role_name")
+    .trim()
+    .isIn(["user", "admin", "manager"])
+    .withMessage("Invalid role value, user must be user or admin or manager"),
+  validatorMiddleware,
+];
+
+exports.createUserValidator = [
+  filterUnknownFields([...userFields, "role_name"]),
+  validateUserField("first_name").trim(),
+  validateUserField("last_name").trim(),
+  validateUserField("email")
+    .trim()
+    .isEmail()
+    .withMessage("Invalid email value"),
+  validateUserField("password")
+    .isLength({ min: 8 })
+    .withMessage("password must be at least 8"),
+  validateUserField("phone_number", true)
+    .isMobilePhone()
+    .withMessage("Invalid phone number value"),
+  validateUserField("role_name", true)
+    .trim()
+    .isIn(["user", "admin", "manager"])
+    .withMessage("Invalid role value, user must be user or admin or manager"),
   validatorMiddleware,
 ];

@@ -250,7 +250,7 @@ exports.findById = async (config) => {
 
 exports.deleteById = async (product_id) => {
   try {
-    const images = getProductImage(pool, product_id);
+    const images = await getProductImage(pool, product_id);
 
     let result = await DatabaseQuery.delete(pool, {
       table: "products",

@@ -10,7 +10,7 @@ exports.createSubCategory = async (req) => {
     subCategory["subCategory_slug"] = slug(
       subCategory["subCategory_name"].toLowerCase()
     );
-    subCategory["category_id"] = req.params.categoryId * 1;
+    // subCategory["category_id"] = req.params.categoryId * 1;
 
     const newSubCategory = await subCategoryModel.create(subCategory);
     return newSubCategory;
