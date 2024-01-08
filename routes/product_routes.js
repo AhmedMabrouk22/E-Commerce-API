@@ -7,7 +7,11 @@ const {
   updateProductValidator,
 } = require("./../validators/product_validators");
 
+const reviewsRoute = require("./review_routes");
+
 const router = express.Router();
+
+router.use("/:productId/reviews", reviewsRoute);
 router
   .route("/")
   .post(

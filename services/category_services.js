@@ -61,43 +61,52 @@ exports.getAllCategories = async (req) => {
 };
 
 exports.updateCategoryById = async (req) => {
-  let category = buildReqBody(req.body);
-  category["category_id"] = req.params.id;
-  if (category["category_name"]) {
-    category["category_slug"] = slug(category["category_name"].toLowerCase());
-  }
-
-  let imagePath;
-  if (req.body.category_image) {
-    const image = await categoryModel.findById({
-      fields: ["category_image"],
-      filter: { category_id: req.params.id },
-    });
-    if (image) {
-      imagePath = image["category_image"];
+  try {
+    let category = buildReqBody(req.body);
+    category["category_id"] = req.params.id;
+    if (category["category_name"]) {
+      category["category_slug"] = slug(category["category_name"].toLowerCase());
     }
+
+    let imagePath;
+    if (req.body.category_image) {
+      const image = await categoryModel.findById({
+        fields: ["category_image"],
+        filter: { category_id: req.params.id },
+      });
+      if (image) {
+        imagePath = image["category_image"];
+      }
+    }
+
+    const newCategory = await categoryModel.updateById(category);
+    // if (newCategory && !newCategory.category_image) {
+    //   defaultImage(newCategory);
+    // }
+
+    if (!newCategory) {
+      fileHandler.deleteFile(req.body.category_image);
+    }
+
+    if (imagePath) {
+      fileHandler.deleteFile(imagePath);
+    }
+
+    return newCategory;
+  } catch (error) {
+    throw error;
   }
-
-  const newCategory = await categoryModel.updateById(category);
-  // if (newCategory && !newCategory.category_image) {
-  //   defaultImage(newCategory);
-  // }
-
-  if (!newCategory) {
-    fileHandler.deleteFile(req.body.category_image);
-  }
-
-  if (imagePath) {
-    fileHandler.deleteFile(imagePath);
-  }
-
-  return newCategory;
 };
 
-exports.deleteCategoryById = async (category_id) => {
-  const category = await categoryModel.deleteById(category_id);
-  if (category) {
-    fileHandler.deleteFile(category["category_image"]);
+exports.deleteCategoryById = async (req) => {
+  try {
+    const category_id = req.params.id;
+    const category = await categoryModel.deleteById(category_id);
+    if (category) {
+      fileHandler.deleteFile(category["category_image"]);
+    }
+    return category;
+  } catch (error) {
+    throw error;
   }
-  return category;
 };

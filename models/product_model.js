@@ -217,7 +217,7 @@ exports.create = async (product) => {
     fileHandler.deleteFiles(images);
     throw error;
   } finally {
-    await client.end();
+    client.release();
   }
 };
 
@@ -328,6 +328,6 @@ exports.updateById = async (product) => {
     fileHandler.deleteFiles(images);
     throw error;
   } finally {
-    await client.end();
+    client.release();
   }
 };

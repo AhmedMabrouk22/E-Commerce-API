@@ -52,38 +52,47 @@ exports.getAllBrands = async (req) => {
 };
 
 exports.updateBrandById = async (req) => {
-  let brand = buildReqBody(req.body);
-  brand["brand_id"] = req.params.id;
-  if (brand["brand_name"]) {
-    brand["brand_slug"] = slug(brand["brand_name"].toLowerCase());
-  }
-
-  let brandImagePath;
-  if (req.body.brand_image) {
-    const image = await brandModel.findById({
-      fields: ["brand_image"],
-      filter: { brand_id: req.params.id },
-    });
-    if (image) {
-      brandImagePath = image["brand_image"];
+  try {
+    let brand = buildReqBody(req.body);
+    brand["brand_id"] = req.params.id;
+    if (brand["brand_name"]) {
+      brand["brand_slug"] = slug(brand["brand_name"].toLowerCase());
     }
-  }
-  const newBrand = await brandModel.updateById(brand);
 
-  if (!newBrand) {
-    fileHandler.deleteFile(req.body.brand_image);
-  }
+    let brandImagePath;
+    if (req.body.brand_image) {
+      const image = await brandModel.findById({
+        fields: ["brand_image"],
+        filter: { brand_id: req.params.id },
+      });
+      if (image) {
+        brandImagePath = image["brand_image"];
+      }
+    }
+    const newBrand = await brandModel.updateById(brand);
 
-  if (brandImagePath) {
-    fileHandler.deleteFile(brandImagePath);
+    if (!newBrand) {
+      fileHandler.deleteFile(req.body.brand_image);
+    }
+
+    if (brandImagePath) {
+      fileHandler.deleteFile(brandImagePath);
+    }
+    return newBrand;
+  } catch (error) {
+    throw error;
   }
-  return newBrand;
 };
 
-exports.deleteBrandById = async (brand_id) => {
-  const brand = await brandModel.deleteById(brand_id);
-  if (brand) {
-    fileHandler.deleteFile(brand["brand_image"]);
+exports.deleteBrandById = async (req) => {
+  try {
+    const brand_id = req.params.id;
+    const brand = await brandModel.deleteById(brand_id);
+    if (brand) {
+      fileHandler.deleteFile(brand["brand_image"]);
+    }
+    return brand;
+  } catch (error) {
+    throw error;
   }
-  return brand;
 };

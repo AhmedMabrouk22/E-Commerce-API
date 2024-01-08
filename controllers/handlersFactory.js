@@ -15,8 +15,8 @@ exports.createOne = (createServices) =>
 
 exports.deleteOne = (deleteServices) =>
   catchAsync(async (req, res, next) => {
-    const id = req.params.id;
-    const result = await deleteServices(id);
+    // const id = req.params.id;
+    const result = await deleteServices(req);
     if (!result) {
       return notFoundMessage(next);
     }

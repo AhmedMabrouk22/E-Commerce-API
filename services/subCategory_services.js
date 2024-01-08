@@ -83,6 +83,11 @@ exports.getSubCategoryById = async (req) => {
   }
 };
 
-exports.deleteSubCategoryById = async (subCategory_id) => {
-  return await subCategoryModel.deleteById(subCategory_id);
+exports.deleteSubCategoryById = async (req) => {
+  try {
+    const subCategory_id = req.params.id;
+    return await subCategoryModel.deleteById(subCategory_id);
+  } catch (error) {
+    throw error;
+  }
 };

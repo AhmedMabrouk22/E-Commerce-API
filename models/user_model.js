@@ -35,7 +35,7 @@ exports.signup = async (user) => {
     }
     throw error;
   } finally {
-    await client.end();
+    client.release();
   }
 };
 

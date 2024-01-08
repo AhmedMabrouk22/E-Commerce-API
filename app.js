@@ -1,13 +1,14 @@
 const express = require("express");
 const morgan = require("morgan");
 
+const globalError = require("./middlewares/error_middleware");
+const AppError = require("./utils/appError");
 const categoryRouter = require("./routes/category_routes");
 const subCategoryRouter = require("./routes/subCategory_routes");
 const brandRouter = require("./routes/brand_routes");
 const productRouter = require("./routes/product_routes");
 const userRouter = require("./routes/user_routes");
-const globalError = require("./middlewares/error_middleware");
-const AppError = require("./utils/appError");
+const reviewRouter = require("./routes/review_routes");
 
 // Start express app
 const app = express();
@@ -30,6 +31,7 @@ app.use("/api/v1/subCategories", subCategoryRouter);
 app.use("/api/v1/brands", brandRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/reviews", reviewRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

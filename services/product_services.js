@@ -67,15 +67,20 @@ exports.getAllProductById = async (req) => {
   }
 };
 
-exports.deleteProductById = async (product_id) => {
-  const product = await productModel.deleteById(product_id);
-  if (product) {
-    fileHandler.deleteFiles([
-      product["product_cover"],
-      ...product["product_images"],
-    ]);
+exports.deleteProductById = async (req) => {
+  try {
+    const product_id = req.params.id;
+    const product = await productModel.deleteById(product_id);
+    if (product) {
+      fileHandler.deleteFiles([
+        product["product_cover"],
+        ...product["product_images"],
+      ]);
+    }
+    return product;
+  } catch (error) {
+    throw error;
   }
-  return product;
 };
 
 exports.updateProductById = async (req) => {

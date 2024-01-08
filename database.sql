@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS products (
 	product_cover TEXT NOT NULL,
 	category_id BIGINT,
 	brand_id BIGINT,
+	ratings_number INTEGER DEFAULT 0,
+	ratings_average DECIMAL(4,2) CHECK (ratings_average BETWEEN 0 AND 5),
 	create_at TIMESTAMP,
 	update_at TIMESTAMP,
 	CONSTRAINT product_cat_fk FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE SET NULL ON UPDATE CASCADE,
@@ -51,6 +53,16 @@ CREATE TABLE IF NOT EXISTS product_sub_categories (
 	CONSTRAINT product_sub_categories_pk PRIMARY KEY(product_id,subCategory_id),
 	CONSTRAINT product_sub_category_fk FOREIGN KEY(subCategory_id) REFERENCES sub_categories(subCategory_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT product_product_fk FOREIGN KEY(product_id) REFERENCES products(product_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS reviews (
+	review_id BIGSERIAL PRIMARY KEY,
+	review_content TEXT NOT NULL,
+	rating INTEGER NOT NULL CHECK (rating BETWEEN 0 AND 5),
+	product_id BIGINT NOT NULL,
+	user_id BIGINT NOT NULL,
+	CONSTRAINT review_product_fk FOREIGN KEY (product_id) REFERENCES products (product_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT review_user_fk FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS cites (
