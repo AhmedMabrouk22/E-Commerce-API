@@ -93,7 +93,6 @@ CREATE TABLE IF NOT EXISTS user_address (
 	country VARCHAR(100) NOT NULL,
 	city VARCHAR(100) NOT NULL,
 	street TEXT NOT NULL,
-	postal_code INT NOT NULL,
     CONSTRAINT user_address_user_fk FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT user_address_alias_unique UNIQUE(address_alias,user_id)
 );
