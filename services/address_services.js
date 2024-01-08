@@ -1,5 +1,3 @@
-const slug = require("slugify");
-
 const addressModel = require("./../models/address_model");
 const ApiFeatures = require("./../utils/apiFeatures");
 const buildReqBody = require("./../utils/buildReqBody");

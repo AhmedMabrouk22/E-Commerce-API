@@ -105,6 +105,21 @@ CREATE TABLE IF NOT EXISTS wishlist (
 	CONSTRAINT wishlist_user_product_unique UNIQUE(user_id,product_id)
 );
 
+CREATE TABLE IF NOT EXISTS coupons (
+	coupon_code VARCHAR(100) PRIMARY KEY,
+	expire TIMESTAMP NOT NULL,
+	discount INT NOT NULL CHECK (discount > 0)
+);
+
+CREATE TABLE IF NOT EXISTS carts (
+	user_id BIGINT NOT NULL,
+	product_id BIGINT NOT NULL,
+	quantity INT NOT NULL DEFAULT 1 CHECK (quantity > 0),
+	CONSTRAINT user_cart_pk PRIMARY KEY (user_id, product_id),
+	CONSTRAINT user_cart_fk FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT product_cart_fk FOREIGN KEY (product_id) REFERENCES products (product_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 -- Create Views
 CREATE OR REPLACE VIEW subCategory_view
 AS 
