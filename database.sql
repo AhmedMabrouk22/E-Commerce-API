@@ -111,13 +111,22 @@ CREATE TABLE IF NOT EXISTS coupons (
 	discount INT NOT NULL CHECK (discount > 0)
 );
 
-CREATE TABLE IF NOT EXISTS carts (
-	user_id BIGINT NOT NULL,
+CREATE TABLE IF NOT EXISTS shopping_carts (
+	cart_id BIGSERIAL NOT NULL UNIQUE,
+	user_id BIGINT NOT NULL UNIQUE,
+	total_cart_price DECIMAL,
+	total_Price_after_discount DECIMAL,
+	CONSTRAINT user_cart_pk PRIMARY KEY (user_id, cart_id),
+	CONSTRAINT user_cart_fk FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS cart_items (
+	cart_id BIGINT NOT NULL,
 	product_id BIGINT NOT NULL,
 	quantity INT NOT NULL DEFAULT 1 CHECK (quantity > 0),
-	CONSTRAINT user_cart_pk PRIMARY KEY (user_id, product_id),
-	CONSTRAINT user_cart_fk FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT product_cart_fk FOREIGN KEY (product_id) REFERENCES products (product_id) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT cart_items_pk PRIMARY KEY (cart_id, product_id),
+	CONSTRAINT product_cart_fk FOREIGN KEY (product_id) REFERENCES products (product_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT shopping_cart_fk FOREIGN KEY (cart_id) REFERENCES shopping_carts (cart_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Create Views
@@ -145,3 +154,13 @@ AS
 SELECT P.product_id,P.product_title, P.product_slug, P.product_cover, P.product_price, W.user_id
 FROM products P INNER JOIN wishlist W
 ON P.product_id = W.product_id
+
+CREATE OR REPLACE VIEW shopping_cart_view
+AS
+SELECT S.*,
+JSON_ARRAYAGG(JSON_BUILD_OBJECT('product_id', P.product_id,'product_title', P.product_title,'product_price',P.product_price,'product_cover',P.product_cover,'quantity',C.quantity)) AS "products"
+FROM shopping_carts S INNER JOIN cart_items C
+ON S.cart_id = C.cart_id
+INNER JOIN products P
+ON P.product_id = C.product_id
+GROUP BY S.cart_id,S.user_id;

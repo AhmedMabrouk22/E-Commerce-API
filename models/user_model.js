@@ -24,6 +24,19 @@ exports.signup = async (user) => {
       },
       [newUser.rows[0].user_id]
     );
+
+    if (newUser.rows[0].role_name === "user") {
+      const user_id = newUser.rows[0].user_id;
+      const user_cart = await DatabaseQuery.insert(
+        client,
+        {
+          fields: ["user_id"],
+          table: "shopping_carts",
+        },
+        user_id
+      );
+    }
+
     await client.query("COMMIT");
     delete newUser.rows[0]["password"];
     delete newUser.rows[0]["active"];
