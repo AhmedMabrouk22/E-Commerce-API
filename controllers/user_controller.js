@@ -6,12 +6,12 @@ const factor = require("./handlersFactory");
 
 // @desc    Update me (logged user)
 // @route   PATCH /api/v1/users/me
-// @access  Private/Protect
+// @access  Protected/User
 exports.updateMe = factor.UpdateOne(userService.updateUser);
 
 // @desc    Get me (logged user)
 // @route   GET /api/v1/users/me
-// @access  Private/Protect
+// @access  Protected/User
 exports.getMe = catchAsync(async (req, res, next) => {
   const email = req.user.email;
   const user = await userService.getUserByEmail(email);
@@ -23,25 +23,25 @@ exports.getMe = catchAsync(async (req, res, next) => {
 
 // @desc    Get list of users
 // @route   GET /api/v1/users
-// @access  Private/Admin
+// @access  Protected/Admin
 exports.getAllUsers = factor.get(userService.getAllUsers);
 
 // @desc    Get user
 // @route   GET /api/v1/users/:id
-// @access  Private/Admin
+// @access  Protected/Admin
 exports.getUser = factor.getOne(userService.getUser);
 
 // @desc    Create user
 // @route   POST  /api/v1/users
-// @access  Private/Admin
+// @access  Protected/Admin
 exports.createUser = factor.createOne(authService.signup);
 
 // @desc    Update specific user
 // @route   PATCH /api/v1/users/:id
-// @access  Private/Admin
+// @access  Protected/Admin
 exports.updateUser = factor.UpdateOne(userService.updateUser);
 
 // @desc    Delete specific user
 // @route   DELETE /api/v1/users/:id
-// @access  Private/Admin
+// @access  Protected/Admin
 exports.deleteUser = factor.deleteOne(userService.deleteUser);

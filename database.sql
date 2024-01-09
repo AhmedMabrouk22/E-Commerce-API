@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS products (
 	product_title VARCHAR(255) NOT NULL,
 	product_slug TEXT,
 	product_description TEXT NOT NULL, 
-	product_quantity INT NOT NULL CHECK (product_quantity > 0),
+	product_quantity INT NOT NULL CHECK (product_quantity >= 0),
 	product_price DECIMAL(6,2) NOT NULL CHECK (product_price > 0),
 	product_cover TEXT NOT NULL,
 	category_id BIGINT,
@@ -216,7 +216,7 @@ O.total_price,O.payment_method,O.is_paid,O.paid_at,O.status,O.shipped_at;
 -- 
 
 BEGIN;
-INSERT INTO users (user_id,first_name,last_name,email,password,role_name) 
-VALUES (1,'super','admin','admin@admin.com','$2b$12$OeZH.MXVb023n33g.qAW2uhimGiBSsvAJ4zfYmQBRdxEfixIuKF/a','admin');
+INSERT INTO users (first_name,last_name,email,password,role_name) 
+VALUES ('super','admin','admin@admin.com','$2b$12$OeZH.MXVb023n33g.qAW2uhimGiBSsvAJ4zfYmQBRdxEfixIuKF/a','admin');
 INSERT INTO user_auth (user_id) VALUES (1);
 COMMIT;

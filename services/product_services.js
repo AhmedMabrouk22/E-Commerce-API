@@ -108,8 +108,8 @@ exports.updateProductById = async (req) => {
 
     if (!newProduct) {
       const images = [];
-      if (newProduct.product_cover) images.push(newProduct.product_cover);
-      if (newProduct.product_images) images.push(...newProduct.product_images);
+      if (product.product_cover) images.push(product.product_cover);
+      if (product.product_images) images.push(...product.product_images);
       fileHandler.deleteFiles(images);
     }
 

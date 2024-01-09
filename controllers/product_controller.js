@@ -64,7 +64,7 @@ exports.resizeImage = catchAsync(async (req, res, next) => {
 
 // @desc    : Create new Product
 // @route   : POST  api/v1/products
-// @access  : Private/Admin-manager
+// @access  : Protected/Admin-manager
 exports.createProduct = factor.createOne(productService.createProduct);
 
 // @desc    : Get all Products
@@ -79,10 +79,10 @@ exports.getAllProduct = factor.getOne(productService.getAllProductById);
 
 // @desc    : Delete Product
 // @route   : DELETE  api/v1/products/:id
-// @access  : Private/Admin-manager
+// @access  : Protected/Admin-manager
 exports.deleteProduct = factor.deleteOne(productService.deleteProductById);
 
 // @desc    : Update Product
 // @route   : PATCH  api/v1/products/:id
-// @access  : Private/Admin-manager
+// @access  : Protected/Admin-manager
 exports.updateProduct = factor.UpdateOne(productService.updateProductById);

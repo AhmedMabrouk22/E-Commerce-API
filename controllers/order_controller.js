@@ -5,30 +5,6 @@ const httpStatusText = require("../utils/httpStatusText");
 const orderServices = require("./../services/order_services");
 const factor = require("./handlersFactory");
 
-exports.createOrder = catchAsync(async (req, res, next) => {
-  const type = req.body.payment_method;
-  let order;
-  if (type === "cash") {
-    order = await orderServices.createOrder(req);
-    return res.status(201).json({
-      status: httpStatusText.SUCCESS,
-      message: "order added successfully",
-      order,
-    });
-  } else {
-    const session = await orderServices.checkoutSession(req);
-    return res.status(200).json({
-      status: httpStatusText.SUCCESS,
-      url: session.url,
-    });
-  }
-});
-exports.getOrders = factor.get(orderServices.getAllOrders);
-
-exports.getOrder = factor.getOne(orderServices.getOrder);
-
-exports.changeOrderStatus = factor.UpdateOne(orderServices.updateOrder);
-
 const createCardOrder = async (session) => {
   try {
     const user_id = session.client_reference_id;
@@ -53,6 +29,43 @@ const createCardOrder = async (session) => {
     throw error;
   }
 };
+
+// @desc    create order
+// @route   POST /api/v1/orders/
+// @access  Protected/User
+exports.createOrder = catchAsync(async (req, res, next) => {
+  const type = req.body.payment_method;
+  let order;
+  if (type === "cash") {
+    order = await orderServices.createOrder(req);
+    return res.status(201).json({
+      status: httpStatusText.SUCCESS,
+      message: "order added successfully",
+      order,
+    });
+  } else {
+    const session = await orderServices.checkoutSession(req);
+    return res.status(200).json({
+      status: httpStatusText.SUCCESS,
+      url: session.url,
+    });
+  }
+});
+
+// @desc    Get all orders
+// @route   GET /api/v1/orders/
+// @access  Protected/User-Admin-Manager
+exports.getOrders = factor.get(orderServices.getAllOrders);
+
+// @desc    Get order
+// @route   GET /api/v1/orders/:id
+// @access  Protected/User-Admin-Manager
+exports.getOrder = factor.getOne(orderServices.getOrder);
+
+// @desc    Change order status
+// @route   PATCH /api/v1/orders/:id
+// @access  Protected/Admin-Manager
+exports.changeOrderStatus = factor.UpdateOne(orderServices.updateOrder);
 
 exports.webhookCheckout = catchAsync(async (req, res, next) => {
   const sig = req.headers["stripe-signature"];

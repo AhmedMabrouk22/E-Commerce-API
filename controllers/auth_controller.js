@@ -45,17 +45,26 @@ exports.resizeImage = async (req, res, next) => {
   next();
 };
 
+// @desc    Signup
+// @route   GET /api/v1/user/signup
+// @access  Public
 exports.signup = catchAsync(async (req, res, next) => {
   const user = await authServices.signup(req);
   createToken(user, 201, res);
 });
 
+// @desc    Login
+// @route   GET /api/v1/user/login
+// @access  Public
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
   const user = await authServices.login(email, password);
   createToken(user, 200, res);
 });
 
+// @desc    Forgot password
+// @route   POST /api/v1/user/forgetPassword
+// @access  Public
 exports.forgetPassword = catchAsync(async (req, res, next) => {
   const { email } = req.body;
   await authServices.forgetPassword(email);
@@ -65,6 +74,9 @@ exports.forgetPassword = catchAsync(async (req, res, next) => {
   });
 });
 
+// @desc    Verify password reset code
+// @route   POST /api/v1/user/verifyResetCode
+// @access  Public
 exports.verifyResetCode = catchAsync(async (req, res, next) => {
   const { code } = req.body;
   const user_id = await authServices.verifyResetCode(code);
@@ -77,12 +89,18 @@ exports.verifyResetCode = catchAsync(async (req, res, next) => {
   });
 });
 
+// @desc    Reset password
+// @route   POST /api/v1/user/resetPassword
+// @access  Public
 exports.resetPassword = catchAsync(async (req, res, next) => {
   const { user_id, password } = req.body;
   const user = await authServices.resetPassword(user_id, password);
   createToken(user, 200, res);
 });
 
+// @desc    Change password
+// @route   POST /api/v1/user/me
+// @access  Protected/User
 exports.changePassword = catchAsync(async (req, res, next) => {
   const { current_password, new_password } = req.body;
   const user = await authServices.changePassword(

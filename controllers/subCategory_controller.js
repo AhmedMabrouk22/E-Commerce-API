@@ -8,14 +8,14 @@ exports.setCategoryIDToBody = (req, res, next) => {
 
 // @desc    : Create new subCategory
 // @route   : POST  api/v1/subCategories
-// @access  : Private
+// @access  : Protected/Admin-Manager
 exports.createSubCategory = factor.createOne(
   subCategoryServices.createSubCategory
 );
 
 // @desc    : Update subCategory
 // @route   : PATCH api/v1/subCategories/:id
-// @access  : Private
+// @access  : Protected/Admin-Manager
 exports.updateSubCategory = factor.UpdateOne(
   subCategoryServices.updateSubCategory
 );
@@ -34,7 +34,7 @@ exports.getSubCategory = factor.getOne(subCategoryServices.getSubCategoryById);
 
 // @desc    : Delete subCategory
 // @route   : DELETE api/v1/subCategories/:id
-// @access  : Private
+// @access  : Protected/Admin-Manager
 exports.deleteSubCategory = factor.deleteOne(
   subCategoryServices.deleteSubCategoryById
 );

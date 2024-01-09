@@ -9,12 +9,12 @@ exports.setProductIdAndUserIdToBody = (req, res, next) => {
 
 // @desc    : Create new Review
 // @route   : POST  api/v1/reviews
-// @access  : Private
+// @access  : Protected/Admin-manager
 exports.createReview = factor.createOne(reviewServices.createReview);
 
 // @desc    : Update Review
 // @route   : PATCH api/v1/reviews/:id
-// @access  : Private
+// @access  : Protected/Admin-manager
 exports.updateReview = factor.UpdateOne(reviewServices.updateReviewById);
 
 // @desc    : Get all Reviews
@@ -29,5 +29,5 @@ exports.getReview = factor.getOne(reviewServices.getReviewById);
 
 // @desc    : Delete Review
 // @route   : DELETE api/v1/reviews/:id
-// @access  : Private
+// @access  : Protected/Admin-manager
 exports.deleteReview = factor.deleteOne(reviewServices.deleteReviewById);
