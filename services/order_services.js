@@ -46,8 +46,9 @@ exports.createOrder = async (req) => {
     };
 
     if (req.body.payment_method === "card") {
-      (orderReq.is_paid = req.body.is_paid),
-        (orderReq.paid_at = req.body.paid_at);
+      orderReq.is_paid = req.body.is_paid;
+      orderReq.paid_at = req.body.paid_at;
+      orderReq.payment_method = "card";
     }
 
     // add order in db
