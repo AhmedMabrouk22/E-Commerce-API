@@ -216,3 +216,11 @@ ON C.product_id = P.product_id
 GROUP BY O.order_id,U.user_id,CONCAT(U.first_name,' ',U.last_name),
 S.total_cart_price,S.total_Price_after_discount,
 O.payment_method,O.is_paid,O.paid_at,O.status,O.shipped_at;
+
+-- 
+
+BEGIN;
+INSERT INTO users (user_id,first_name,last_name,email,password,role_name) 
+VALUES (1,'super','admin','admin@admin.com','$2b$12$OeZH.MXVb023n33g.qAW2uhimGiBSsvAJ4zfYmQBRdxEfixIuKF/a','admin');
+INSERT INTO user_auth (user_id) VALUES (1);
+COMMIT;

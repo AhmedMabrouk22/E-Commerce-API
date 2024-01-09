@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+var cors = require("cors");
 
 const globalError = require("./middlewares/error_middleware");
 const AppError = require("./utils/appError");
@@ -19,16 +20,17 @@ const { webhookCheckout } = require("./controllers/order_controller");
 // Start express app
 const app = express();
 
+// 1) Global middlewares
+app.use(express.static("./uploads"));
+app.use(express.json());
+app.use(cors());
+
 // Checkout webhook
 app.post(
   "/webhook-checkout",
   express.raw({ type: "application/json" }),
   webhookCheckout
 );
-
-// 1) Global middlewares
-app.use(express.static("./uploads"));
-app.use(express.json());
 
 // 2) Development logging
 if (process.env.NODE_ENV == "development") {
