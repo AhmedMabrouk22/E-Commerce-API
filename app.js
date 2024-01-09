@@ -13,9 +13,18 @@ const wishlistRouter = require("./routes/wishlist_routes");
 const addressRouter = require("./routes/address_routes");
 const couponRouter = require("./routes/coupon_routes");
 const cartRouter = require("./routes/shoppingCart_routes");
+const orderRouter = require("./routes/order_routes");
+const { webhookCheckout } = require("./controllers/order_controller");
 
 // Start express app
 const app = express();
+
+// Checkout webhook
+app.post(
+  "/webhook-checkout",
+  express.raw({ type: "application/json" }),
+  webhookCheckout
+);
 
 // 1) Global middlewares
 app.use(express.static("./uploads"));
@@ -40,6 +49,7 @@ app.use("/api/v1/wishlist", wishlistRouter);
 app.use("/api/v1/addresses", addressRouter);
 app.use("/api/v1/coupons", couponRouter);
 app.use("/api/v1/shoppingCart", cartRouter);
+app.use("/api/v1/orders", orderRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

@@ -27,7 +27,11 @@ exports.add = async (req) => {
     let request = buildQueryBody(req.body);
     const user_id = req.user.user_id;
     const product_id = req.body.product_id;
-    const cart = await cartModel.getCart(user_id);
+    let cart = await cartModel.getCart(user_id);
+
+    if (!cart) {
+      cart = await cartModel.createShoppingCart(user_id);
+    }
 
     // 2) check if this product is exist in cart
     const cart_id = cart.cart_id;
@@ -131,6 +135,16 @@ exports.applyCoupon = async (req) => {
     });
 
     return newCart;
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.getCart = async (req) => {
+  try {
+    const user_id = req.user.user_id;
+    const cart = await cartModel.getCart(user_id);
+    return cart;
   } catch (error) {
     throw error;
   }

@@ -129,12 +129,37 @@ CREATE TABLE IF NOT EXISTS cart_items (
 	CONSTRAINT shopping_cart_fk FOREIGN KEY (cart_id) REFERENCES shopping_carts (cart_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS orders (
+	order_id BIGSERIAL PRIMARY KEY,
+	user_id BIGINT NOT NULL,
+	shipping_address BIGINT NOT NULL,
+	total_price DECIMAL NOT NULL ,
+	payment_method VARCHAR(100) NOT NULL DEFAULT 'cash' CHECK (payment_method IN ('cash','card')),
+	is_paid BOOLEAN NOT NULL DEFAULT false,
+	paid_at TIMESTAMP,
+	status VARCHAR(100) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','processing','shipped')),
+	shipped_at TIMESTAMP,
+	CONSTRAINT user_order_fk FOREIGN KEY(user_id) REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT address_order_fk FOREIGN KEY(shipping_address) REFERENCES user_address (address_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS order_items (
+	order_id BIGINT NOT NULL,
+	product_id BIGINT NOT NULL,
+	quantity INT NOT NULL DEFAULT 1 CHECK (quantity > 0),
+	CONSTRAINT order_items_pk PRIMARY KEY (order_id, product_id),
+	CONSTRAINT product_order_fk FOREIGN KEY (product_id) REFERENCES products (product_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT order_fk FOREIGN KEY (order_id) REFERENCES orders (order_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 -- Create Views
 CREATE OR REPLACE VIEW subCategory_view
 AS 
 SELECT s.subcategory_id, s.subcategory_name,s.subcategory_slug,s.category_id,c.category_name
 FROM sub_categories s LEFT JOIN categories c
 ON s.category_id = c.category_id;
+
+-- 
 
 CREATE OR REPLACE VIEW products_view
 AS
@@ -149,11 +174,15 @@ LEFT JOIN product_images PI
 ON PI.product_id = P.product_id
 GROUP BY P.product_id;
 
+-- 
+
 CREATE OR REPLACE VIEW product_wishlist_view
 AS
 SELECT P.product_id,P.product_title, P.product_slug, P.product_cover, P.product_price, W.user_id
 FROM products P INNER JOIN wishlist W
 ON P.product_id = W.product_id
+
+-- 
 
 CREATE OR REPLACE VIEW shopping_cart_view
 AS
@@ -164,3 +193,26 @@ ON S.cart_id = C.cart_id
 INNER JOIN products P
 ON P.product_id = C.product_id
 GROUP BY S.cart_id,S.user_id;
+
+-- 
+
+CREATE OR REPLACE VIEW order_view
+AS
+SELECT O.order_id,
+U.user_id,CONCAT(U.first_name,' ',U.last_name) AS "user_name", U.email AS "user_email",
+S.total_cart_price,S.total_Price_after_discount,
+O.payment_method,O.is_paid,O.paid_at,O.status,O.shipped_at,
+JSON_ARRAYAGG(JSON_BUILD_OBJECT('product_id', P.product_id,'product_title', P.product_title,'product_price',P.product_price,'product_cover',P.product_cover,'quantity',C.quantity)) AS "products"
+FROM orders O INNER JOIN users U
+ON O.user_id = U.user_id
+INNER JOIN user_address A
+ON U.user_id = A.user_id
+INNER JOIN shopping_carts S
+ON O.cart_id = S.cart_id
+INNER JOIN cart_items C
+ON S.cart_id = C.cart_id
+INNER JOIN products P
+ON C.product_id = P.product_id
+GROUP BY O.order_id,U.user_id,CONCAT(U.first_name,' ',U.last_name),
+S.total_cart_price,S.total_Price_after_discount,
+O.payment_method,O.is_paid,O.paid_at,O.status,O.shipped_at;

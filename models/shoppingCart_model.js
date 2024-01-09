@@ -1,6 +1,22 @@
 const pool = require("./../config/db");
 const DatabaseQuery = require("./../utils/database");
 
+exports.createShoppingCart = async (user_id) => {
+  try {
+    const user_cart = await DatabaseQuery.insert(
+      pool,
+      {
+        fields: ["user_id"],
+        table: "shopping_carts",
+      },
+      [user_id]
+    );
+    return user_cart.rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
+
 exports.getCart = async (user_id) => {
   try {
     const result = await DatabaseQuery.select(pool, {
@@ -76,7 +92,7 @@ exports.deleteProduct = async (cart_id, product_id) => {
 exports.clearCart = async (cart_id) => {
   try {
     const result = await DatabaseQuery.delete(pool, {
-      table: "cart_items",
+      table: "shopping_carts",
       where: { cart_id },
     });
     return result;
