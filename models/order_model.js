@@ -36,7 +36,7 @@ exports.createOrder = async (order) => {
       where: { cart_id },
     });
 
-    // move items from cart_items to order_items
+    // move items from cart_items to order_items and update quantity
     for (const product of products.rows) {
       const fieldsAndValues = DatabaseQuery.buildFieldsAndValues(product);
       await DatabaseQuery.insert(
@@ -47,7 +47,24 @@ exports.createOrder = async (order) => {
         },
         [order_id, ...fieldsAndValues[1]]
       );
-      console.log(product);
+
+      const product_quantity = await DatabaseQuery.select(client, {
+        table: "products",
+        fields: ["product_quantity"],
+        where: { product_id: product.product_id },
+      });
+
+      const curVal = product_quantity.rows[0].product_quantity;
+
+      await DatabaseQuery.update(
+        client,
+        {
+          table: "products",
+          where: { product_id: product.product_id },
+          fields: ["product_quantity"],
+        },
+        [curVal - product.quantity]
+      );
     }
 
     await client.query("COMMIT");

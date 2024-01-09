@@ -2,6 +2,7 @@ const cartModel = require("./../models/shoppingCart_model");
 const couponModel = require("./../models/coupon_model");
 const buildQueryBody = require("./../utils/buildReqBody");
 const AppError = require("../utils/appError");
+const productModel = require("./../models/product_model");
 
 const calcTotalCartPrice = async (cart_id) => {
   try {
@@ -43,6 +44,19 @@ exports.add = async (req) => {
         (item) => item.product_id == product_id
       );
     }
+
+    const curProduct = await productModel.findById({
+      filter: { product_id },
+    });
+
+    if (!curProduct) {
+      throw new AppError(`this product is not found`, 404);
+    }
+
+    if (request.quantity > curProduct.product_quantity) {
+      throw new AppError(`Invalid quantity value`, 400);
+    }
+
     // 3) if exist increase quantity
     let newItem;
     request.cart_id = cart_id;
@@ -51,6 +65,9 @@ exports.add = async (req) => {
         let quantity = products[productIndex].quantity;
         quantity += 1;
         request.quantity = quantity;
+        if (request.quantity > curProduct.product_quantity) {
+          throw new AppError(`Invalid quantity value`, 400);
+        }
       }
       newItem = await cartModel.updateProduct(request);
     } else {

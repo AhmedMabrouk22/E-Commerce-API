@@ -94,8 +94,8 @@ exports.changeRoleValidator = [
   filterUnknownFields("role_name"),
   validateUserField("role_name")
     .trim()
-    .isIn(["user", "admin", "manager"])
-    .withMessage("Invalid role value, user must be user or admin or manager"),
+    .isIn(["admin", "manager"])
+    .withMessage("Invalid role value, user must be admin or manager"),
   validatorMiddleware,
 ];
 
