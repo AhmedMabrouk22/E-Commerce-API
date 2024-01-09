@@ -62,8 +62,6 @@ exports.createOrder = async (req) => {
   }
 };
 
-exports.createCardOrder = async (req) => {};
-
 exports.getAllOrders = async (req) => {
   try {
     const stringQuery = req.query;

@@ -9,7 +9,7 @@ exports.createOrder = catchAsync(async (req, res, next) => {
   const type = req.body.payment_method;
   let order;
   if (type === "cash") {
-    order = await orderServices.createCashOrder(req);
+    order = await orderServices.createOrder(req);
     return res.status(201).json({
       status: httpStatusText.SUCCESS,
       message: "order added successfully",
@@ -40,14 +40,14 @@ const createCardOrder = async (session) => {
       paid_at: new Date(Date.now()).toISOString(),
     };
 
-    const req = {
+    const reqOrder = {
       user: {
         user_id,
       },
       body,
     };
 
-    const order = await orderServices.createOrder(req);
+    const order = await orderServices.createOrder(reqOrder);
     return order;
   } catch (error) {
     throw error;
@@ -66,7 +66,7 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
 
     // add order
     if (event.type === "checkout.session.completed") {
-      createCardOrder(event.data.object);
+      await createCardOrder(event.data.object);
     }
 
     res.status(200).json({ received: true });
