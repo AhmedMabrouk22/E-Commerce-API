@@ -200,22 +200,18 @@ CREATE OR REPLACE VIEW order_view
 AS
 SELECT O.order_id,
 U.user_id,CONCAT(U.first_name,' ',U.last_name) AS "user_name", U.email AS "user_email",
-S.total_cart_price,S.total_Price_after_discount,
-O.payment_method,O.is_paid,O.paid_at,O.status,O.shipped_at,
+O.total_price,O.payment_method,O.is_paid,O.paid_at,O.status,O.shipped_at,
 JSON_AGG(JSON_BUILD_OBJECT('product_id', P.product_id,'product_title', P.product_title,'product_price',P.product_price,'product_cover',P.product_cover,'quantity',C.quantity)) AS "products"
 FROM orders O INNER JOIN users U
 ON O.user_id = U.user_id
 INNER JOIN user_address A
 ON U.user_id = A.user_id
-INNER JOIN shopping_carts S
-ON O.user_id = S.user_id
-INNER JOIN cart_items C
-ON S.cart_id = C.cart_id
+INNER JOIN order_items C
+ON O.order_id = C.order_id
 INNER JOIN products P
 ON C.product_id = P.product_id
 GROUP BY O.order_id,U.user_id,CONCAT(U.first_name,' ',U.last_name),
-S.total_cart_price,S.total_Price_after_discount,
-O.payment_method,O.is_paid,O.paid_at,O.status,O.shipped_at;
+O.total_price,O.payment_method,O.is_paid,O.paid_at,O.status,O.shipped_at;
 
 -- 
 

@@ -47,6 +47,7 @@ exports.createOrder = async (order) => {
         },
         [order_id, ...fieldsAndValues[1]]
       );
+      console.log(product);
     }
 
     await client.query("COMMIT");
