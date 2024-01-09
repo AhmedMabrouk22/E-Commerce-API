@@ -55,16 +55,6 @@ CREATE TABLE IF NOT EXISTS product_sub_categories (
 	CONSTRAINT product_product_fk FOREIGN KEY(product_id) REFERENCES products(product_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS reviews (
-	review_id BIGSERIAL PRIMARY KEY,
-	review_content TEXT NOT NULL,
-	rating INTEGER NOT NULL CHECK (rating BETWEEN 0 AND 5),
-	product_id BIGINT NOT NULL,
-	user_id BIGINT NOT NULL,
-	CONSTRAINT review_product_fk FOREIGN KEY (product_id) REFERENCES products (product_id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT review_user_fk FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS users (
 	user_id BIGSERIAL PRIMARY KEY,
 	first_name VARCHAR(100) NOT NULL,
@@ -75,6 +65,16 @@ CREATE TABLE IF NOT EXISTS users (
 	profile_image TEXT,
 	role_name VARCHAR(100) CHECK(role_name IN ('user','admin','manager')) DEFAULT 'user',
 	active BOOLEAN DEFAULT 'TRUE'
+);
+
+CREATE TABLE IF NOT EXISTS reviews (
+	review_id BIGSERIAL PRIMARY KEY,
+	review_content TEXT NOT NULL,
+	rating INTEGER NOT NULL CHECK (rating BETWEEN 0 AND 5),
+	product_id BIGINT NOT NULL,
+	user_id BIGINT NOT NULL,
+	CONSTRAINT review_product_fk FOREIGN KEY (product_id) REFERENCES products (product_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT review_user_fk FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_auth (
@@ -164,8 +164,8 @@ ON s.category_id = c.category_id;
 CREATE OR REPLACE VIEW products_view
 AS
 SELECT P.*,
-JSON_ARRAYAGG(JSON_BUILD_OBJECT('subcategory_id', S.subcategory_id,'subcategory_name', S.subcategory_name,'subcategory_slug',S.subcategory_slug)) AS "subCategories",
-JSON_ARRAYAGG(PI.image_path) AS "Images"
+JSON_AGG(JSON_BUILD_OBJECT('subcategory_id', S.subcategory_id,'subcategory_name', S.subcategory_name,'subcategory_slug',S.subcategory_slug)) AS "subCategories",
+JSON_AGG(PI.image_path) AS "Images"
 FROM products P INNER JOIN product_sub_categories PS
 ON P.product_id = PS.product_id
 INNER JOIN sub_categories s
@@ -180,14 +180,14 @@ CREATE OR REPLACE VIEW product_wishlist_view
 AS
 SELECT P.product_id,P.product_title, P.product_slug, P.product_cover, P.product_price, W.user_id
 FROM products P INNER JOIN wishlist W
-ON P.product_id = W.product_id
+ON P.product_id = W.product_id;
 
 -- 
 
 CREATE OR REPLACE VIEW shopping_cart_view
 AS
 SELECT S.*,
-JSON_ARRAYAGG(JSON_BUILD_OBJECT('product_id', P.product_id,'product_title', P.product_title,'product_price',P.product_price,'product_cover',P.product_cover,'quantity',C.quantity)) AS "products"
+JSON_AGG(JSON_BUILD_OBJECT('product_id', P.product_id,'product_title', P.product_title,'product_price',P.product_price,'product_cover',P.product_cover,'quantity',C.quantity)) AS "products"
 FROM shopping_carts S INNER JOIN cart_items C
 ON S.cart_id = C.cart_id
 INNER JOIN products P
@@ -202,13 +202,13 @@ SELECT O.order_id,
 U.user_id,CONCAT(U.first_name,' ',U.last_name) AS "user_name", U.email AS "user_email",
 S.total_cart_price,S.total_Price_after_discount,
 O.payment_method,O.is_paid,O.paid_at,O.status,O.shipped_at,
-JSON_ARRAYAGG(JSON_BUILD_OBJECT('product_id', P.product_id,'product_title', P.product_title,'product_price',P.product_price,'product_cover',P.product_cover,'quantity',C.quantity)) AS "products"
+JSON_AGG(JSON_BUILD_OBJECT('product_id', P.product_id,'product_title', P.product_title,'product_price',P.product_price,'product_cover',P.product_cover,'quantity',C.quantity)) AS "products"
 FROM orders O INNER JOIN users U
 ON O.user_id = U.user_id
 INNER JOIN user_address A
 ON U.user_id = A.user_id
 INNER JOIN shopping_carts S
-ON O.cart_id = S.cart_id
+ON O.user_id = S.user_id
 INNER JOIN cart_items C
 ON S.cart_id = C.cart_id
 INNER JOIN products P
