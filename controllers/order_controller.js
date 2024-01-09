@@ -47,22 +47,21 @@ const createCardOrder = catchAsync(async (session) => {
 exports.webhookCheckout = catchAsync(async (req, res, next) => {
   const sig = req.headers["stripe-signature"];
 
-  let event;
-
   try {
-    event = stripe.webhooks.constructEvent(
+    const event = stripe.webhooks.constructEvent(
       req.body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-  } catch (err) {
-    console.log(event.data.object);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-  if (event.type === "checkout.session.completed") {
-    //  Create order
-    createCardOrder(event.data.object);
-  }
 
-  res.status(200).json({ received: true });
+    // Handle the event
+    console.log("Webhook event:", event);
+
+    res.status(200).json({ received: true });
+  } catch (err) {
+    console.error("Error:", err.message);
+    res.status(400).json({
+      error: err.message,
+    });
+  }
 });
