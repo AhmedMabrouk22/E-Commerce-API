@@ -146,8 +146,8 @@ exports.checkoutSession = async (req) => {
         },
       ],
       mode: "payment",
-      success_url: `${req.protocol}://${req.get("host")}/orders`,
-      cancel_url: `${req.protocol}://${req.get("host")}/shoppingCart`,
+      success_url: `${req.protocol}://${req.get("host")}/api/v1/orders`,
+      cancel_url: `${req.protocol}://${req.get("host")}/api/v1/shoppingCart`,
       customer_email: req.user.email,
       client_reference_id: cart_id,
       metadata: {

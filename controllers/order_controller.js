@@ -37,6 +37,8 @@ const createCardOrder = catchAsync(async (session) => {
     cart_id,
     shipping_address_id,
     payment_method,
+    is_paid: true,
+    paid_at: new Date(Date.now()).toISOString(),
   };
   const order = await orderServices.createCashOrder(req);
   return order;
@@ -54,17 +56,13 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
+    console.log(event.data.object);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
-  let order;
   if (event.type === "checkout.session.completed") {
     //  Create order
-    order = createCardOrder(event.data.object);
+    createCardOrder(event.data.object);
   }
 
-  res.status(201).json({
-    status: httpStatusText.SUCCESS,
-    message: "order added successfully",
-    order,
-  });
+  res.status(200).json({ received: true });
 });
