@@ -124,7 +124,15 @@ exports.checkoutSession = async (req) => {
       throw new AppError(`This user not has shopping cart`, 404);
     }
 
-    const cart_id = cart.cart_id;
+    // get user address
+    const address = await addressModel.findById({
+      filter: { address_id: req.body.shipping_address_id },
+    });
+
+    if (!address) {
+      console.log("not found");
+      throw new AppError(`this address not found`, 404);
+    }
 
     // get order price
     let total_price;
