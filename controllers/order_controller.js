@@ -29,26 +29,30 @@ exports.getOrder = factor.getOne(orderServices.getOrder);
 
 exports.changeOrderStatus = factor.UpdateOne(orderServices.updateOrder);
 
-const createCardOrder = catchAsync(async (session) => {
-  const user_id = session.client_reference_id;
-  const shipping_address_id = session.metadata.shipping_address_id;
-  const body = {
-    shipping_address_id,
-    payment_method,
-    is_paid: true,
-    paid_at: new Date(Date.now()).toISOString(),
-  };
+const createCardOrder = async (session) => {
+  try {
+    const user_id = session.client_reference_id;
+    const shipping_address_id = session.metadata.shipping_address_id;
+    const body = {
+      shipping_address_id,
+      payment_method: "card",
+      is_paid: true,
+      paid_at: new Date(Date.now()).toISOString(),
+    };
 
-  const req = {
-    user: {
-      user_id,
-    },
-    body,
-  };
+    const req = {
+      user: {
+        user_id,
+      },
+      body,
+    };
 
-  const order = await orderServices.createOrder(req);
-  return order;
-});
+    const order = await orderServices.createOrder(req);
+    return order;
+  } catch (error) {
+    throw error;
+  }
+};
 
 exports.webhookCheckout = catchAsync(async (req, res, next) => {
   const sig = req.headers["stripe-signature"];
