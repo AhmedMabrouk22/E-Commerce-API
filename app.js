@@ -31,7 +31,6 @@ app.post(
 app.use(express.static("./uploads"));
 app.use(express.json());
 app.use(cors());
-// app.use(express.raw({ type: "application/json" }));
 
 // 2) Development logging
 if (process.env.NODE_ENV == "development") {

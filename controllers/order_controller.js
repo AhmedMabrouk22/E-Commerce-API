@@ -31,7 +31,7 @@ exports.changeOrderStatus = factor.UpdateOne(orderServices.updateOrder);
 
 const createCardOrder = catchAsync(async (session) => {
   const cart_id = session.client_reference_id;
-  const shipping_address_id = session.metadata;
+  const shipping_address_id = session.metadata.shipping_address_id;
   const payment_method = "card";
   const req = {
     cart_id,
@@ -54,8 +54,10 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
 
-    // Handle the event
-    console.log("Webhook event:", event);
+    // add order
+    if (event.type === "checkout.session.completed") {
+      createCardOrder(event.data.object);
+    }
 
     res.status(200).json({ received: true });
   } catch (err) {
