@@ -1,3 +1,5 @@
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
+
 const catchAsync = require("../utils/catchAsync");
 const httpStatusText = require("../utils/httpStatusText");
 const orderServices = require("./../services/order_services");

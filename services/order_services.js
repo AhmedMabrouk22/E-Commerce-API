@@ -150,6 +150,7 @@ exports.checkoutSession = async (req) => {
       cancel_url: `${req.protocol}://${req.get("host")}/shoppingCart`,
       customer_email: req.user.email,
       client_reference_id: cart_id,
+      metadata: req.body.shipping_address_id,
     });
     return session;
   } catch (error) {
