@@ -30,17 +30,23 @@ exports.getOrder = factor.getOne(orderServices.getOrder);
 exports.changeOrderStatus = factor.UpdateOne(orderServices.updateOrder);
 
 const createCardOrder = catchAsync(async (session) => {
-  const cart_id = session.client_reference_id;
+  const user_id = session.client_reference_id;
   const shipping_address_id = session.metadata.shipping_address_id;
-  const payment_method = "card";
-  const req = {
-    cart_id,
+  const body = {
     shipping_address_id,
     payment_method,
     is_paid: true,
     paid_at: new Date(Date.now()).toISOString(),
   };
-  const order = await orderServices.createCashOrder(req);
+
+  const req = {
+    user: {
+      user_id,
+    },
+    body,
+  };
+
+  const order = await orderServices.createOrder(req);
   return order;
 });
 

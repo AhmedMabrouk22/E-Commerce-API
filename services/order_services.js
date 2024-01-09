@@ -7,7 +7,7 @@ const AppError = require("./../utils/appError");
 const buildReqBody = require("./../utils/buildReqBody");
 const ApiFeatures = require("./../utils/apiFeatures");
 
-exports.createCashOrder = async (req) => {
+exports.createOrder = async (req) => {
   try {
     // get user shopping cart
     const user_id = req.user.user_id;
@@ -38,13 +38,17 @@ exports.createCashOrder = async (req) => {
 
     //paid_at: new Date(Date.now()).toISOString(),
 
-    const orderReq = {
+    let orderReq = {
       cart_id,
       user_id: req.user.user_id,
       shipping_address: req.body.shipping_address_id,
       total_price,
-      is_paid: false,
     };
+
+    if (req.body.payment_method === "card") {
+      (orderReq.is_paid = req.body.is_paid),
+        (orderReq.paid_at = req.body.paid_at);
+    }
 
     // add order in db
     const order = await orderModel.createOrder(orderReq);
@@ -57,6 +61,8 @@ exports.createCashOrder = async (req) => {
     throw error;
   }
 };
+
+exports.createCardOrder = async (req) => {};
 
 exports.getAllOrders = async (req) => {
   try {
@@ -149,7 +155,7 @@ exports.checkoutSession = async (req) => {
       success_url: `${req.protocol}://${req.get("host")}/api/v1/orders`,
       cancel_url: `${req.protocol}://${req.get("host")}/api/v1/shoppingCart`,
       customer_email: req.user.email,
-      client_reference_id: cart_id,
+      client_reference_id: req.user.user_id,
       metadata: {
         shipping_address_id: req.body.shipping_address_id,
       },
