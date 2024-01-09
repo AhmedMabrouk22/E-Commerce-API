@@ -77,3 +77,17 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
     });
   }
 });
+
+exports.orderSuccess = (req, res, next) => {
+  res.status(200).json({
+    status: httpStatusText.SUCCESS,
+    message: `Order added successfully`,
+  });
+};
+
+exports.orderCancel = (req, res, next) => {
+  res.status(200).json({
+    status: httpStatusText.FAIL,
+    message: `Something wrong, order canceled`,
+  });
+};

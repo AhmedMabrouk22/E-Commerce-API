@@ -24,6 +24,9 @@ router
     orderController.getOrders
   );
 
+router.get("/success", orderController.orderSuccess);
+router.get("/cancel", orderController.orderCancel);
+
 router
   .route("/:id")
   .get(
