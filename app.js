@@ -20,18 +20,18 @@ const { webhookCheckout } = require("./controllers/order_controller");
 // Start express app
 const app = express();
 
-// 1) Global middlewares
-app.use(express.static("./uploads"));
-app.use(express.json());
-app.use(cors());
-app.use(express.raw({ type: "*/*" }));
-
 // Checkout webhook
 app.post(
   "/webhook-checkout",
   express.raw({ type: "application/json" }),
   webhookCheckout
 );
+
+// 1) Global middlewares
+app.use(express.static("./uploads"));
+app.use(express.json());
+app.use(cors());
+// app.use(express.raw({ type: "application/json" }));
 
 // 2) Development logging
 if (process.env.NODE_ENV == "development") {
