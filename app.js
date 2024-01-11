@@ -50,7 +50,7 @@ if (process.env.NODE_ENV == "development") {
 // });
 
 // Apply the rate limiting middleware to all requests
-app.use("/api", limiter);
+// app.use("/api", limiter);
 
 // 3) Routes
 app.use("/api/v1/categories", categoryRouter);
