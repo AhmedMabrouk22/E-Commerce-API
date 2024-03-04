@@ -114,7 +114,3 @@ STRIPE_WEBHOOK_SECRET=
 ```
 npm start
 ```
-
-## Database ERD
-
-![E-Commerce](https://github.com/AhmedMabrouk22/Blog-API/assets/105928025/d0d23398-a05f-4539-b5c6-f0933ea60196)
